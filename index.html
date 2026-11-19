@@ -632,7 +632,7 @@ html.pmode .pexit:hover{opacity:1}
 .tc7 .tkg2{padding:1.8vh 2.4vw}
 .tkg2 .tkm em.tkx{font-size:clamp(19px,1.6vw,31px);letter-spacing:0}
 .lg5{display:flex;flex-direction:column}
-.lr{display:grid;grid-template-columns:2.2vw minmax(0,1fr) auto;align-items:center;column-gap:.8vw;padding:.75vh 0}
+.lr{display:grid;grid-template-columns:2.2vw minmax(0,1fr) auto;align-items:center;column-gap:.8vw;padding:.55vh 0}
 .lr>i{font-style:normal;font-size:clamp(20px,1.7vw,32px);font-weight:300;color:rgba(241,239,232,.45);text-align:center}
 .lr>span{font-size:clamp(16px,1.3vw,24px);font-weight:600;color:rgba(241,239,232,.9);line-height:1.2}
 .lr>span small{display:block;font-size:.68em;font-weight:500;color:rgba(241,239,232,.55);margin-top:.2vh}
@@ -648,6 +648,11 @@ html.pmode .pexit:hover{opacity:1}
 .cv3 .cvl4 .cvh p{font-size:clamp(18px,1.55vw,29px);line-height:1.3}
 .cv3 .cvl4{gap:2.6vh}
 .cv3 .cvl4 .cvp{padding-top:2.4vh}
+.lr.lt{background:rgba(192,221,151,.09);border:1px solid rgba(192,221,151,.35);border-radius:12px;padding:.7vh .8vw .7vh 0;margin:.3vh -.8vw .3vh 0}
+.lr.lt>span{color:#fff;font-weight:800}
+.lr.lt>b{font-size:clamp(24px,2.1vw,40px);color:#C0DD97}
+.lr.lt .lpc{font-style:normal;display:inline-block;margin-top:.3vh;padding:.1em .6em;border-radius:999px;background:rgba(192,221,151,.18);color:#C0DD97;font-weight:700}
+.lr.lsv{margin-top:.2vh}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
 .big .lbuso .br{grid-template-columns:minmax(220px,1fr) 4fr 200px;font-size:17px}
@@ -1513,7 +1518,7 @@ function renderPres(){
      <div class="lg5">
       <div class="lr"><i></i><span>Operación actual<small>horas navegadas al año</small></span><b>${nfp(tH)} h</b></div>
       <div class="lr"><i>−</i><span>Modelo + 10% spot<small>modelo ${nfp(mH)} h + spot ${nfp(sp)} h</small></span><b>${nfp(nt)} h</b></div>
-      <div class="lr lt"><i>=</i><span>Horas menos al año<small>${p0(dif/tH*100)} menos que hoy</small></span><b>${nfp(dif)} h</b></div>
+      <div class="lr lt"><i>=</i><span>Diferencia: horas menos al año<small><em class="lpc">${p0(dif/tH*100)} menos que hoy</em></small></span><b>−${nfp(dif)} h</b></div>
       <div class="lr"><i>×</i><span>Precio promedio actual<small>costo actual entre horas navegadas</small></span><b>${money(BASE_COST/tH)}/h</b></div>
       <div class="lr lsv"><i>=</i><span>Ahorro estimado<small>al año, a la tarifa actual</small></span><b>${kf(dif*BASE_COST/tH)}</b></div>
      </div>
