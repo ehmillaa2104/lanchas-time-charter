@@ -15,7 +15,7 @@ Guía para trabajar este repo con Claude Code.
 - `MODELS[0].plan` es el horario del modelo (lunes a domingo; `a` = lancha de 44, `b` = lancha de 20).
 - `SAVED_PLAN` carga el horario guardado al 19 nov 2026. Si se cambia el horario de forma permanente, hay que actualizar `SAVED_PLAN`.
 - `BASE_COST` es el costo anual actual sin Comanche; el punto de equilibrio es `BASE_COST * 0.9 / 365`.
-- Diapositiva 7 (propuesta de Arpón, 19 nov 2026): $22,500 al mes por lancha x 3 lanchas x 12 meses, sin combustible. El combustible se estima a $1,000/t con 83.5 kg/h (Perseverance e Infinity) y 43 kg/h (Arpón 1); son estimaciones con naves comparables, no datos de Arpón.
+- Diapositiva 7 (propuesta de Arpón, 19 nov 2026): $22,500 al mes por lancha x 3 lanchas x 12 meses, sin combustible. Combustible: supuesto de 200 t al año a $1,000/t (definido por Esteban).
 
 ## Reglas de redacción
 

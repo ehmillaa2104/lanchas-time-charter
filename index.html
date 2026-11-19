@@ -657,10 +657,10 @@ html.pmode .pexit:hover{opacity:1}
 .ar7 .col{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.09)}
 .ar7 .arl,.ar7 .arr{padding:3.2vh 2.4vw;gap:2.4vh;justify-content:center}
 .art{width:100%;border-collapse:collapse;font-size:clamp(16px,1.45vw,27px)}
-.art th{font-size:.62em;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,239,232,.55);text-align:left;padding:0 0 1vh;border-bottom:1px solid rgba(255,255,255,.14)}
+.art th{font-size:.58em;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,239,232,.55);text-align:left;padding:0 0 1vh;border-bottom:1px solid rgba(255,255,255,.14)}
 .art td{padding:1.8vh 0;border-bottom:1px solid rgba(255,255,255,.08);color:#F1EFE8;font-weight:600}
-.art td:first-child{font-weight:800;color:#fff}
-.art .n{text-align:right;font-variant-numeric:tabular-nums}
+.art td:first-child{font-weight:800;color:#fff;white-space:nowrap}
+.art .n{text-align:right;font-variant-numeric:tabular-nums;padding-left:1.2vw;white-space:nowrap}
 .art tr:last-child td{border-bottom:0}
 .arc{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:1.4vh;font-size:clamp(15px,1.25vw,23px);color:rgba(241,239,232,.78);line-height:1.35}
 .arc li{padding-left:1.2em;position:relative}
@@ -670,6 +670,7 @@ html.pmode .pexit:hover{opacity:1}
 .lr.lt2>span{color:#fff;font-weight:800}
 .lr.lt2>b{font-weight:900;font-size:clamp(22px,2vw,38px)}
 .ar7 .lr{padding:1vh 0}
+.art td small{display:block;font-size:.62em;font-weight:500;color:rgba(241,239,232,.6);margin-top:.3vh;white-space:nowrap}
 .ar7 .pen{font-size:clamp(12px,1vw,18px);color:rgba(241,239,232,.6)}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
@@ -1592,17 +1593,17 @@ function renderPres(){
   </div>
  </section>
  ${(()=>{const h1=hrs('a',DS,0,24)*52,h2=hrs('b',DS,0,24)*52,hs=tH*0.10,hT=h1+h2+hs;
-  const KR=83.5,KL=43.0,PT=1000,MES=22500,NL=3;   // kg/h estimados con naves comparables (Perseverance e Infinity 24 kn; Arpón 1 16 kn)
-  const ft=(h1*KR+h2*KL+hs*KR)/1000,fc=ft*PT,ch=MES*NL*12,tot=ch+fc,ah=BASE_COST-tot;
+  const PT=1000,MES=22500,NL=3,ft=200;   // combustible: supuesto de 200 t al año (Esteban, 19 nov 2026)
+  const fc=ft*PT,ch=MES*NL*12,tot=ch+fc,ah=BASE_COST-tot;
   return `<section class="sl ar7s">${num(7)}
   <p class="kick">Propuesta de Arpón: Time Charter</p>
   <div class="ar7">
    <div class="col arl">
     <span class="cvt">Propuesta recibida, tarifa sin negociar</span>
-    <table class="art"><thead><tr><th>Embarcación</th><th class="n">Pasajeros</th><th class="n">Tarifa / día</th><th class="n">Mes (30 días)</th></tr></thead><tbody>
-     <tr><td>Arpón Perseverance</td><td class="n">29</td><td class="n">$750</td><td class="n">$22,500</td></tr>
-     <tr><td>Arpón 1</td><td class="n">18</td><td class="n">$750</td><td class="n">$22,500</td></tr>
-     <tr><td>Arpón Infinity</td><td class="n">18</td><td class="n">$750</td><td class="n">$22,500</td></tr>
+    <table class="art"><thead><tr><th>Embarcación</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Pallets</th><th class="n">Drums</th><th class="n">Mes</th></tr></thead><tbody>
+     <tr><td>Perseverance</td><td class="n">29</td><td class="n">5 t</td><td class="n">6</td><td class="n">20</td><td class="n">$22,500</td></tr>
+     <tr><td>Arpón 1</td><td class="n">18</td><td class="n">6 t</td><td class="n">9</td><td class="n">30</td><td class="n">$22,500</td></tr>
+     <tr><td>Infinity</td><td class="n">18</td><td class="n">6 t</td><td class="n">9</td><td class="n">20</td><td class="n">$22,500</td></tr>
     </tbody></table>
     <ul class="arc">
      <li><b>Capitán y marino incluidos</b>, disponibles 24/7 los 365 días</li>
@@ -1614,12 +1615,12 @@ function renderPres(){
     <span class="cvt">Costo anual estimado</span>
     <div class="lg5">
      <div class="lr"><i></i><span>Fletamento<small>$22,500 × ${NL} lanchas × 12 meses</small></span><b>${kf(ch)}</b></div>
-     <div class="lr"><i>+</i><span>Combustible<small>${nfp(ft)} t × $1,000/t, para ${nfp(hT)} h de modelo y spot</small></span><b>${kf(fc)}</b></div>
+     <div class="lr"><i>+</i><span>Combustible<small>${nfp(ft)} t al año × $1,000/t, para ${nfp(hT)} h de modelo y spot</small></span><b>${kf(fc)}</b></div>
      <div class="lr lt2"><i>=</i><span>Costo anual con Arpón</span><b>${kf(tot)}</b></div>
      <div class="lr"><i></i><span>Costo actual<small>al año, sin Comanche</small></span><b>${kf(BASE_COST)}</b></div>
      <div class="lr lsv"><i>=</i><span>Ahorro estimado<small>${p0(ah/BASE_COST*100)} menos que hoy</small></span><b>${kf(ah)}</b></div>
     </div>
-    <p class="pen">Combustible estimado con naves comparables, porque Arpón no informa motores ni consumo: Perseverance hace las horas de la lancha 1 e Infinity el spot (unos 84 kg/h); Arpón 1 hace las de la lancha 2 (unos 43 kg/h).</p>
+    <p class="pen">Combustible: supuesto de 200 t al año. Arpón puede cotizar con combustible incluido si se le entregan los viajes diarios.</p>
    </div>
   </div>
  </section>`;})()}
