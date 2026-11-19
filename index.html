@@ -615,6 +615,39 @@ html.pmode .pexit:hover{opacity:1}
 .tkm span{font-size:clamp(14px,1.15vw,21px);color:rgba(241,239,232,.7);line-height:1.3}
 .tkp{margin:0;font-size:clamp(15px,1.25vw,23px);font-weight:600;color:#F1EFE8;line-height:1.35}
 .tkp span{font-size:.7em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ac1);margin-right:.6em}
+.tkg2{padding:1.8vh 2.4vw;gap:0;justify-content:center}
+.tkh,.tkr{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.45fr) 2.4vw minmax(0,1.2fr);align-items:center;column-gap:1.6vw}
+.tkh{padding-bottom:.8vh;border-bottom:1px solid rgba(255,255,255,.14)}
+.tkh span{font-size:clamp(12px,.95vw,17px);font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ac1)}
+.tkr{padding:.95vh 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.tkr:last-child{border-bottom:0}
+.tkr>i{font-style:normal;font-size:clamp(20px,1.8vw,34px);color:rgba(241,239,232,.4);text-align:center}
+.tkg2 .tkt{font-size:clamp(20px,1.7vw,32px);font-weight:800;color:#fff;line-height:1.15}
+.tkg2 .tkn{font-size:.75em;font-weight:900;color:var(--ac1);margin-right:.7em}
+.tkg2 .tkm{display:grid;grid-template-columns:clamp(100px,7.6vw,146px) minmax(0,1fr);align-items:center;gap:1vw;padding:0;border:0}
+.tkg2 .tkm em{font-style:normal;font-size:clamp(26px,2.3vw,44px);font-weight:900;line-height:1;letter-spacing:-.02em;color:#F1EFE8;white-space:nowrap}
+.tkg2 .tkm span{font-size:clamp(14px,1.15vw,21px);color:rgba(241,239,232,.72);line-height:1.3}
+.tkg2 .tkp{margin:0;font-size:clamp(16px,1.35vw,25px);font-weight:700;color:#F1EFE8;line-height:1.3}
+.tc7 .pe2{padding:2.2vh 2.4vw}
+.tc7 .tkg2{padding:1.8vh 2.4vw}
+.tkg2 .tkm em.tkx{font-size:clamp(19px,1.6vw,31px);letter-spacing:0}
+.lg5{display:flex;flex-direction:column}
+.lr{display:grid;grid-template-columns:2.2vw minmax(0,1fr) auto;align-items:center;column-gap:.8vw;padding:.75vh 0}
+.lr>i{font-style:normal;font-size:clamp(20px,1.7vw,32px);font-weight:300;color:rgba(241,239,232,.45);text-align:center}
+.lr>span{font-size:clamp(16px,1.3vw,24px);font-weight:600;color:rgba(241,239,232,.9);line-height:1.2}
+.lr>span small{display:block;font-size:.68em;font-weight:500;color:rgba(241,239,232,.55);margin-top:.2vh}
+.lr>b{font-size:clamp(20px,1.75vw,33px);font-weight:800;color:#F1EFE8;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.lr.lt{border-top:1px solid rgba(255,255,255,.22);margin-top:.4vh;padding-top:1vh}
+.lr.lt>b{font-weight:900}
+.lr.lsv{border-top:1px solid rgba(255,255,255,.22);margin-top:.4vh;padding-top:1.1vh}
+.lr.lsv>span{color:#fff;font-weight:800}
+.lr.lsv>b{font-size:clamp(30px,2.8vw,54px);font-weight:900;background:linear-gradient(135deg,var(--ac1),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.cv3 .cvl4 .cvh{display:grid !important;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:1.6vw;row-gap:1.8vh}
+.cv3 .cvl4 .cvh .lnk{grid-column:1 / -1}
+.cv3 .cvl4 .big90{font-size:clamp(80px,7.4vw,142px)}
+.cv3 .cvl4 .cvh p{font-size:clamp(18px,1.55vw,29px);line-height:1.3}
+.cv3 .cvl4{gap:2.6vh}
+.cv3 .cvl4 .cvp{padding-top:2.4vh}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
 .big .lbuso .br{grid-template-columns:minmax(220px,1fr) 4fr 200px;font-size:17px}
@@ -1476,10 +1509,14 @@ function renderPres(){
      <div class="lnk"><a href="#opcion-1">Ver el modelo →</a><a href="#linea-base">Ver la cobertura en detalle →</a></div>
     </div>
     <div class="cvp">
-     <span class="cvt">Eficiencia en horas al año</span>
-     <div class="hb"><span class="hlb">Operación actual</span><div class="ht"><i class="hcur" style="width:100%"></i></div><b>${nfp(tH)} h</b></div>
-     <div class="hb"><span class="hlb">Modelo + 10% spot</span><div class="ht"><i class="hmod" style="width:${w(mH)}%"></i><i class="hspot" style="width:${w(sp)}%"></i></div><b>${nfp(nt)} h</b></div>
-     <div class="hres"><b>−${nfp(dif)} h</b><span>al año, ${p0(dif/tH*100)} menos que hoy<small>Modelo ${nfp(mH)} h + spot ${nfp(sp)} h</small></span></div>
+     <span class="cvt">Eficiencia del modelo</span>
+     <div class="lg5">
+      <div class="lr"><i></i><span>Operación actual<small>horas navegadas al año</small></span><b>${nfp(tH)} h</b></div>
+      <div class="lr"><i>−</i><span>Modelo + 10% spot<small>modelo ${nfp(mH)} h + spot ${nfp(sp)} h</small></span><b>${nfp(nt)} h</b></div>
+      <div class="lr lt"><i>=</i><span>Horas menos al año<small>${p0(dif/tH*100)} menos que hoy</small></span><b>${nfp(dif)} h</b></div>
+      <div class="lr"><i>×</i><span>Precio promedio actual<small>costo actual entre horas navegadas</small></span><b>${money(BASE_COST/tH)}/h</b></div>
+      <div class="lr lsv"><i>=</i><span>Ahorro estimado<small>al año, a la tarifa actual</small></span><b>${kf(dif*BASE_COST/tH)}</b></div>
+     </div>
     </div>
    </div>
    <div class="col cvr">
@@ -1513,20 +1550,21 @@ function renderPres(){
      <i>÷</i>
      <div class="eqb"><small>Días</small><b>365</b><span>del año</span></div>
      <i>=</i>
-     <div class="eqb eqr"><small>Tarifa máxima</small><b>${money(eq)}</b><span>por día, 2 lanchas, con combustible<br>${money(eq/2)} por lancha</span></div>
+     <div class="eqb eqr"><small>Precio / día</small><b>${money(eq)}</b><span>2 lanchas, con combustible<br>${money(eq/2)} por lancha</span></div>
     </div>
     <p class="pen">La tarifa debe incluir el combustible, igual que el costo actual. Por debajo de este valor, el charter cuesta menos que la operación de hoy.</p>
    </div>
-   <div class="tkg">
-    <div class="col tk"><b class="tkt"><span class="tkn">01</span>Horario contratado</b>
-     <div class="tkm"><em>${l1n}%</em><span>de uso de la lancha de 44 después de las 18:00</span></div>
-     <p class="tkp"><span>Propuesta</span>Contratar 12 horas, de 6:00 a 18:00</p></div>
-    <div class="col tk"><b class="tkt"><span class="tkn">02</span>Fin de semana</b>
-     <div class="tkm"><em>${weT}%</em><span>de uso de las dos lanchas el sábado y domingo</span></div>
-     <p class="tkp"><span>Propuesta</span>Una sola lancha en charter el fin de semana</p></div>
-    <div class="col tk"><b class="tkt"><span class="tkn">03</span>Combustible</b>
-     <div class="tkm"><em class="tkx">Incluido</em><span>en la tarifa, igual que en el costo actual</span></div>
-     <p class="tkp"><span>Propuesta</span>Pedir tarifas con combustible incluido</p></div>
+   <div class="col tkg2">
+    <div class="tkh"><span>Tema</span><span>Situación actual</span><span></span><span>Propuesta</span></div>
+    <div class="tkr"><b class="tkt"><span class="tkn">01</span>Horario contratado</b>
+     <div class="tkm"><em>${l1n}%</em><span>de uso de la lancha de 44 después de las 18:00</span></div><i>→</i>
+     <p class="tkp">Contratar 12 horas, de 6:00 a 18:00</p></div>
+    <div class="tkr"><b class="tkt"><span class="tkn">02</span>Fin de semana</b>
+     <div class="tkm"><em>${weT}%</em><span>de uso de las dos lanchas el sábado y domingo</span></div><i>→</i>
+     <p class="tkp">Una sola lancha en charter</p></div>
+    <div class="tkr"><b class="tkt"><span class="tkn">03</span>Combustible</b>
+     <div class="tkm"><em class="tkx">Incluido</em><span>en el costo actual de las lanchas</span></div><i>→</i>
+     <p class="tkp">Pedir tarifas con combustible incluido</p></div>
    </div>
   </div>
  </section>
