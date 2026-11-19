@@ -655,7 +655,7 @@ html.pmode .pexit:hover{opacity:1}
 .lr.lsv{margin-top:.2vh}
 .ar7{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2.4vw;align-items:stretch}
 .ar7 .col{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.09)}
-.ar7 .arl,.ar7 .arr{padding:3.2vh 2.4vw;gap:2.4vh;justify-content:center}
+.ar7 .arl,.ar7 .arr{padding:2.8vh 2.4vw;gap:2vh;justify-content:center}
 .art{width:100%;border-collapse:collapse;font-size:clamp(16px,1.45vw,27px)}
 .art th{font-size:.58em;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,239,232,.55);text-align:left;padding:0 0 1vh;border-bottom:1px solid rgba(255,255,255,.14)}
 .art td{padding:1.8vh 0;border-bottom:1px solid rgba(255,255,255,.08);color:#F1EFE8;font-weight:600}
@@ -669,9 +669,16 @@ html.pmode .pexit:hover{opacity:1}
 .lr.lt2{border-top:1px solid rgba(255,255,255,.22);margin-top:.4vh;padding-top:1vh}
 .lr.lt2>span{color:#fff;font-weight:800}
 .lr.lt2>b{font-weight:900;font-size:clamp(22px,2vw,38px)}
-.ar7 .lr{padding:1vh 0}
+.ar7 .lr{padding:.7vh 0}
 .art td small{display:block;font-size:.62em;font-weight:500;color:rgba(241,239,232,.6);margin-top:.3vh;white-space:nowrap}
 .ar7 .pen{font-size:clamp(12px,1vw,18px);color:rgba(241,239,232,.6)}
+.pdx{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8vw}
+.pdb{display:flex;flex-direction:column;gap:.3vh;padding:1.2vh 1vw;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
+.pdb small{white-space:nowrap;font-size:clamp(11px,.85vw,16px);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(241,239,232,.55)}
+.pdb b{font-size:clamp(22px,2vw,38px);font-weight:900;line-height:1;color:#F1EFE8;font-variant-numeric:tabular-nums}
+.pdb span{font-size:clamp(11px,.85vw,16px);color:rgba(241,239,232,.6)}
+.pdb.pdr{border-color:rgba(93,202,165,.5);background:rgba(93,202,165,.08)}
+.pdb.pdr b{background:linear-gradient(135deg,var(--ac1),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
 .big .lbuso .br{grid-template-columns:minmax(220px,1fr) 4fr 200px;font-size:17px}
@@ -1606,7 +1613,7 @@ function renderPres(){
      <tr><td>Infinity</td><td class="n">18</td><td class="n">6 t</td><td class="n">9</td><td class="n">20</td><td class="n">$22,500</td></tr>
     </tbody></table>
     <ul class="arc">
-     <li><b>Capitán y marino incluidos</b>, disponibles 24/7 los 365 días</li>
+     <li><b>Disponibles 24/7, los 365 días:</b> las lanchas quedan listas para cuando se necesiten, con capitán y marino incluidos</li>
      <li><b>Reemplazo de la nave</b> si falla o entra a mantenimiento</li>
      <li><b>Sin combustible:</b> se carga en Flamenco Marina</li>
     </ul>
@@ -1620,6 +1627,7 @@ function renderPres(){
      <div class="lr"><i></i><span>Costo actual<small>al año, sin Comanche</small></span><b>${kf(BASE_COST)}</b></div>
      <div class="lr lsv"><i>=</i><span>Ahorro estimado<small>${p0(ah/BASE_COST*100)} menos que hoy</small></span><b>${kf(ah)}</b></div>
     </div>
+    <div class="pdx"><div class="pdb pdr"><small>Arpón / día</small><b>${money(tot/365)}</b><span>3 lanchas con combustible</span></div><div class="pdb"><small>Equilibrio / día</small><b>${money(eq)}</b><span>precio máximo del charter</span></div><div class="pdb"><small>Hoy / día</small><b>${money(BASE_COST/365)}</b><span>costo actual</span></div></div>
     <p class="pen">Combustible: supuesto de 200 t al año. Arpón puede cotizar con combustible incluido si se le entregan los viajes diarios.</p>
    </div>
   </div>
