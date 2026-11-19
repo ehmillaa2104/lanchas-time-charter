@@ -11,10 +11,11 @@ Guía para trabajar este repo con Claude Code.
 ## Cómo está armado `index.html`
 
 - Pestañas: Presentación, Modelo, Situación actual, Línea base y cobertura, Tareas de TT, Proveedores.
-- `renderPres` arma las 9 diapositivas de la presentación; usa los ayudantes `row`, `card`, `num` y los formatos `kf`, `money`, `nfp`.
+- `renderPres` arma las 10 diapositivas de la presentación; usa los ayudantes `row`, `card`, `num` y los formatos `kf`, `money`, `nfp`.
 - `MODELS[0].plan` es el horario del modelo (lunes a domingo; `a` = lancha de 44, `b` = lancha de 20).
 - `SAVED_PLAN` carga el horario guardado al 19 nov 2026. Si se cambia el horario de forma permanente, hay que actualizar `SAVED_PLAN`.
 - `BASE_COST` es el costo anual actual sin Comanche; el punto de equilibrio es `BASE_COST * 0.9 / 365`.
+- Diapositiva 7 (propuesta de Arpón, 19 nov 2026): $22,500 al mes por lancha x 3 lanchas x 12 meses, sin combustible. El combustible se estima a $1,000/t con 83.5 kg/h (Perseverance e Infinity) y 43 kg/h (Arpón 1); son estimaciones con naves comparables, no datos de Arpón.
 
 ## Reglas de redacción
 

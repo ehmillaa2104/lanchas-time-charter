@@ -653,6 +653,24 @@ html.pmode .pexit:hover{opacity:1}
 .lr.lt>b{font-size:clamp(24px,2.1vw,40px);color:#C0DD97}
 .lr.lt .lpc{font-style:normal;display:inline-block;margin-top:.3vh;padding:.1em .6em;border-radius:999px;background:rgba(192,221,151,.18);color:#C0DD97;font-weight:700}
 .lr.lsv{margin-top:.2vh}
+.ar7{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2.4vw;align-items:stretch}
+.ar7 .col{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.09)}
+.ar7 .arl,.ar7 .arr{padding:3.2vh 2.4vw;gap:2.4vh;justify-content:center}
+.art{width:100%;border-collapse:collapse;font-size:clamp(16px,1.45vw,27px)}
+.art th{font-size:.62em;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(241,239,232,.55);text-align:left;padding:0 0 1vh;border-bottom:1px solid rgba(255,255,255,.14)}
+.art td{padding:1.8vh 0;border-bottom:1px solid rgba(255,255,255,.08);color:#F1EFE8;font-weight:600}
+.art td:first-child{font-weight:800;color:#fff}
+.art .n{text-align:right;font-variant-numeric:tabular-nums}
+.art tr:last-child td{border-bottom:0}
+.arc{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:1.4vh;font-size:clamp(15px,1.25vw,23px);color:rgba(241,239,232,.78);line-height:1.35}
+.arc li{padding-left:1.2em;position:relative}
+.arc li::before{content:'';position:absolute;left:0;top:.5em;width:.45em;height:.45em;border-radius:50%;background:var(--ac1)}
+.arc b{color:#F1EFE8}
+.lr.lt2{border-top:1px solid rgba(255,255,255,.22);margin-top:.4vh;padding-top:1vh}
+.lr.lt2>span{color:#fff;font-weight:800}
+.lr.lt2>b{font-weight:900;font-size:clamp(22px,2vw,38px)}
+.ar7 .lr{padding:1vh 0}
+.ar7 .pen{font-size:clamp(12px,1vw,18px);color:rgba(241,239,232,.6)}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
 .big .lbuso .br{grid-template-columns:minmax(220px,1fr) 4fr 200px;font-size:17px}
@@ -1435,7 +1453,7 @@ function lbCalc(mi){
 // Pestaña Presentación: resumen para mostrar en TV, letras grandes.
 function renderPres(){
  ['.keys','#hsub','#st'].forEach(q=>{const el=document.querySelector(q);if(el)el.style.display='none';});
- const n=9,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
+ const n=10,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
  const card=(nn,html)=>`<div class="cx"><span class="nn">${nn}</span><div>${html}</div></div>`;
  const row=(nn,t,sub)=>`<div class="rw"><span class="nn">${nn}</span><div>${t}<small>${sub}</small></div></div>`;
  const CVp=lbCalc(0),ttc=CVp.cob.find(r=>r.demanda==='Total TT')||{en_horario:0,mismo_dia:0};
@@ -1573,7 +1591,39 @@ function renderPres(){
    </div>
   </div>
  </section>
- <section class="sl">${num(7)}
+ ${(()=>{const h1=hrs('a',DS,0,24)*52,h2=hrs('b',DS,0,24)*52,hs=tH*0.10,hT=h1+h2+hs;
+  const KR=83.5,KL=43.0,PT=1000,MES=22500,NL=3;   // kg/h estimados con naves comparables (Perseverance e Infinity 24 kn; Arpón 1 16 kn)
+  const ft=(h1*KR+h2*KL+hs*KR)/1000,fc=ft*PT,ch=MES*NL*12,tot=ch+fc,ah=BASE_COST-tot;
+  return `<section class="sl ar7s">${num(7)}
+  <p class="kick">Propuesta de Arpón: Time Charter</p>
+  <div class="ar7">
+   <div class="col arl">
+    <span class="cvt">Propuesta recibida, tarifa sin negociar</span>
+    <table class="art"><thead><tr><th>Embarcación</th><th class="n">Pasajeros</th><th class="n">Tarifa / día</th><th class="n">Mes (30 días)</th></tr></thead><tbody>
+     <tr><td>Arpón Perseverance</td><td class="n">29</td><td class="n">$750</td><td class="n">$22,500</td></tr>
+     <tr><td>Arpón 1</td><td class="n">18</td><td class="n">$750</td><td class="n">$22,500</td></tr>
+     <tr><td>Arpón Infinity</td><td class="n">18</td><td class="n">$750</td><td class="n">$22,500</td></tr>
+    </tbody></table>
+    <ul class="arc">
+     <li><b>Capitán y marino incluidos</b>, disponibles 24/7 los 365 días</li>
+     <li><b>Reemplazo de la nave</b> si falla o entra a mantenimiento</li>
+     <li><b>Sin combustible:</b> se carga en Flamenco Marina</li>
+    </ul>
+   </div>
+   <div class="col arr">
+    <span class="cvt">Costo anual estimado</span>
+    <div class="lg5">
+     <div class="lr"><i></i><span>Fletamento<small>$22,500 × ${NL} lanchas × 12 meses</small></span><b>${kf(ch)}</b></div>
+     <div class="lr"><i>+</i><span>Combustible<small>${nfp(ft)} t × $1,000/t, para ${nfp(hT)} h de modelo y spot</small></span><b>${kf(fc)}</b></div>
+     <div class="lr lt2"><i>=</i><span>Costo anual con Arpón</span><b>${kf(tot)}</b></div>
+     <div class="lr"><i></i><span>Costo actual<small>al año, sin Comanche</small></span><b>${kf(BASE_COST)}</b></div>
+     <div class="lr lsv"><i>=</i><span>Ahorro estimado<small>${p0(ah/BASE_COST*100)} menos que hoy</small></span><b>${kf(ah)}</b></div>
+    </div>
+    <p class="pen">Combustible estimado con naves comparables, porque Arpón no informa motores ni consumo: Perseverance hace las horas de la lancha 1 e Infinity el spot (unos 84 kg/h); Arpón 1 hace las de la lancha 2 (unos 43 kg/h).</p>
+   </div>
+  </div>
+ </section>`;})()}
+ <section class="sl">${num(8)}
   <p class="kick">Alternativa de contratación</p>
   <h2>Bolsa de horas: <em>paquete base + spot</em></h2>
   ${(()=>{const st=stats(MODELS[0]),h=st.tot*52,spH=tH*0.10,avg=BASE_COST/tH;
@@ -1592,7 +1642,7 @@ function renderPres(){
    </div>
   </div>`;})()}
  </section>`;})()}
- <section class="sl">${num(8)}
+ <section class="sl">${num(9)}
   <p class="kick">Recomendaciones para implementar</p>
   <div class="g2 prf rec tc">
    ${card('01',`<b>Coordinador de logística</b><small>Con autoridad para asignar lanchas y definir rutas de MOTI y Trader Tanker. Comanche y spot, solo en casos excepcionales.</small>`)}
@@ -1601,7 +1651,7 @@ function renderPres(){
    ${card('04',`<b>Logística de materiales e insumos</b><small>Consolidar los pedidos de materiales, insumos y consumibles para aprovechar cada viaje y extender la autonomía de los barcos entre entregas.</small>`)}
   </div>
  </section>
- <section class="sl">${num(9)}
+ <section class="sl">${num(10)}
   <p class="kick">Próximos pasos</p>
   <div class="col cons5">
    ${row('01','<b>Definir la forma de contratación</b>','Time Charter o bolsa de horas con spot')}
