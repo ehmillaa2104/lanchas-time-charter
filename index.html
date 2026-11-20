@@ -672,6 +672,7 @@ html.pmode .pexit:hover{opacity:1}
 .ar7 .lr{padding:.7vh 0}
 .art td small{display:block;font-size:.62em;font-weight:500;color:rgba(241,239,232,.6);margin-top:.3vh;white-space:nowrap}
 .ar7 .pen{font-size:clamp(12px,1vw,18px);color:rgba(241,239,232,.6)}
+.art td small.inl{display:inline;margin-left:.3em}
 .pdx{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8vw}
 .pdb{display:flex;flex-direction:column;gap:.3vh;padding:1.2vh 1vw;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
 .pdb small{white-space:nowrap;font-size:clamp(11px,.85vw,16px);font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(241,239,232,.55)}
@@ -1464,7 +1465,7 @@ function lbCalc(mi){
 // Pestaña Presentación: resumen para mostrar en TV, letras grandes.
 function renderPres(){
  ['.keys','#hsub','#st'].forEach(q=>{const el=document.querySelector(q);if(el)el.style.display='none';});
- const n=10,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
+ const n=11,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
  const card=(nn,html)=>`<div class="cx"><span class="nn">${nn}</span><div>${html}</div></div>`;
  const row=(nn,t,sub)=>`<div class="rw"><span class="nn">${nn}</span><div>${t}<small>${sub}</small></div></div>`;
  const CVp=lbCalc(0),ttc=CVp.cob.find(r=>r.demanda==='Total TT')||{en_horario:0,mismo_dia:0};
@@ -1613,10 +1614,10 @@ function renderPres(){
   <div class="ar7">
    <div class="col arl">
     <span class="cvt">Propuesta recibida, tarifa sin negociar</span>
-    <table class="art"><thead><tr><th>Embarcación</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Pallets</th><th class="n">Drums</th><th class="n">gal/h</th><th class="n">Mes</th></tr></thead><tbody>
-     <tr><td>Perseverance</td><td class="n">29</td><td class="n">5 t</td><td class="n">6</td><td class="n">20</td><td class="n">48 a 52</td><td class="n">$22,500</td></tr>
-     <tr><td>Arpón 1</td><td class="n">18</td><td class="n">6 t</td><td class="n">9</td><td class="n">30</td><td class="n">40.2</td><td class="n">$22,500</td></tr>
-     <tr><td>Infinity</td><td class="n">18</td><td class="n">6 t</td><td class="n">9</td><td class="n">20</td><td class="n">40.2</td><td class="n">$22,500</td></tr>
+    <table class="art"><thead><tr><th>Embarcación</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Drums</th><th class="n">gal/h</th><th class="n">Día</th><th class="n">Mes</th></tr></thead><tbody>
+     <tr><td>Perseverance</td><td class="n">29</td><td class="n">5 t</td><td class="n">20</td><td class="n">48 a 52</td><td class="n">$750</td><td class="n">$22,500</td></tr>
+     <tr><td>Arpón 1</td><td class="n">18</td><td class="n">6 t</td><td class="n">30</td><td class="n">40.2</td><td class="n">$750</td><td class="n">$22,500</td></tr>
+     <tr><td>Infinity</td><td class="n">18</td><td class="n">6 t</td><td class="n">20</td><td class="n">40.2</td><td class="n">$750</td><td class="n">$22,500</td></tr>
     </tbody></table>
     <ul class="arc">
      <li><b>Disponibles 24/7, los 365 días:</b> las lanchas quedan listas para cuando se necesiten, con capitán y marino incluidos</li>
@@ -1638,7 +1639,42 @@ function renderPres(){
    </div>
   </div>
  </section>`;})()}
- <section class="sl">${num(8)}
+ ${(()=>{const h1=hrs('a',DS,0,24)*52,h2=hrs('b',DS,0,24)*52,hs=tH*0.10,hT=h1+h2+hs,s1=h1/(h1+h2),H1=hT*s1,H2=hT-H1;
+  // Estimación (Esteban, 20 nov 2026): una lancha de 44 pasajeros y una de carga, sin nombre, a $750 por día cada una.
+  // Horas del modelo y el spot repartidas según el uso de cada lancha en el modelo. Consumo de referencia: lancha de 44 como Perseverance
+  // (50 gal/h) y lancha de carga como Arpón 1 (40.2 gal/h), con los datos que informó Arpón.
+  const G1=50,G2=40.2,KGG=3.785411784*0.84,PT=1000,DIA=750,NL=2;
+  const gal=H1*G1+H2*G2,ft=gal*KGG/1000,fc=ft*PT,ch=DIA*NL*365,tot=ch+fc,ah=BASE_COST-tot,neg=ah<0;
+  return `<section class="sl ar7s">${num(8)}
+  <p class="kick">Estimación: 2 lanchas en Time Charter</p>
+  <div class="ar7">
+   <div class="col arl">
+    <span class="cvt">Lanchas del modelo a $750 por día</span>
+    <table class="art"><thead><tr><th>Lancha</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Horas al año</th><th class="n">gal/h</th><th class="n">Día</th></tr></thead><tbody>
+     <tr><td>Lancha de 44</td><td class="n">44</td><td class="n"></td><td class="n">${nfp(H1)} h <small class="inl">${p0(s1*100)}</small></td><td class="n">50</td><td class="n">$750</td></tr>
+     <tr><td>Lancha de carga</td><td class="n">20</td><td class="n">6 t</td><td class="n">${nfp(H2)} h <small class="inl">${p0((1-s1)*100)}</small></td><td class="n">40.2</td><td class="n">$750</td></tr>
+    </tbody></table>
+    <ul class="arc">
+     <li><b>Mismo precio que la propuesta de Arpón:</b> $750 por día por lancha, sin combustible</li>
+     <li><b>Mismas horas:</b> las ${nfp(hT)} h del modelo y el spot, repartidas según el uso de cada lancha en el modelo</li>
+     <li><b>Consumo de referencia:</b> la de 44 como Perseverance y la de carga como Arpón 1</li>
+    </ul>
+   </div>
+   <div class="col arr">
+    <span class="cvt">Costo anual estimado</span>
+    <div class="lg5">
+     <div class="lr"><i></i><span>Fletamento<small>$750 × ${NL} lanchas × 365 días</small></span><b>${kf(ch)}</b></div>
+     <div class="lr"><i>+</i><span>Combustible<small>${nfp(ft)} t × $1,000/t (${nfp(gal)} gal)</small></span><b>${kf(fc)}</b></div>
+     <div class="lr lt2"><i>=</i><span>Costo anual estimado</span><b>${kf(tot)}</b></div>
+     <div class="lr"><i></i><span>Costo actual<small>al año, sin Comanche</small></span><b>${kf(BASE_COST)}</b></div>
+     <div class="lr lsv${neg?' lng':''}"><i>=</i><span>${neg?'Costo adicional':'Ahorro estimado'}<small>${p0(Math.abs(ah)/BASE_COST*100)} ${neg?'más':'menos'} que hoy</small></span><b>${neg?'+':''}${kf(Math.abs(ah))}</b></div>
+    </div>
+    <div class="pdx"><div class="pdb pdr${tot/365>eq?' png':''}"><small>Estimación / día</small><b>${money(tot/365)}</b><span>con combustible</span></div><div class="pdb"><small>Equilibrio / día</small><b>${money(eq)}</b><span>precio máximo</span></div><div class="pdb"><small>Hoy / día</small><b>${money(BASE_COST/365)}</b><span>costo actual</span></div></div>
+    <p class="pen">Consumo aplicado a todas las horas. Es un techo: con motores apagados en espera, baja.</p>
+   </div>
+  </div>
+ </section>`;})()}
+ <section class="sl">${num(9)}
   <p class="kick">Alternativa de contratación</p>
   <h2>Bolsa de horas: <em>paquete base + spot</em></h2>
   ${(()=>{const st=stats(MODELS[0]),h=st.tot*52,spH=tH*0.10,avg=BASE_COST/tH;
@@ -1657,7 +1693,7 @@ function renderPres(){
    </div>
   </div>`;})()}
  </section>`;})()}
- <section class="sl">${num(9)}
+ <section class="sl">${num(10)}
   <p class="kick">Recomendaciones para implementar</p>
   <div class="g2 prf rec tc">
    ${card('01',`<b>Coordinador de logística</b><small>Con autoridad para asignar lanchas y definir rutas de MOTI y Trader Tanker. Comanche y spot, solo en casos excepcionales.</small>`)}
@@ -1666,7 +1702,7 @@ function renderPres(){
    ${card('04',`<b>Logística de materiales e insumos</b><small>Consolidar los pedidos de materiales, insumos y consumibles para aprovechar cada viaje y extender la autonomía de los barcos entre entregas.</small>`)}
   </div>
  </section>
- <section class="sl">${num(10)}
+ <section class="sl">${num(11)}
   <p class="kick">Próximos pasos</p>
   <div class="col cons5">
    ${row('01','<b>Definir la forma de contratación</b>','Time Charter o bolsa de horas con spot')}
