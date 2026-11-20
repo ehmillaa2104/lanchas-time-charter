@@ -690,6 +690,17 @@ html.pmode .pexit:hover{opacity:1}
 .ptm.ptx{font-size:clamp(17px,1.45vw,27px);letter-spacing:0;color:var(--ac1)}
 .ptp{margin:0;font-size:clamp(13px,1.08vw,20px);color:rgba(241,239,232,.78);line-height:1.35}
 .pat .tkt{font-size:clamp(17px,1.45vw,27px)}
+.nd{display:flex;flex-direction:column}
+.nd>div{display:grid;grid-template-columns:minmax(0,1fr) auto clamp(110px,8.6vw,165px);align-items:center;column-gap:1vw;padding:.7vh 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.nd>div:first-child{border-top:1px solid rgba(255,255,255,.14)}
+.nd span{font-size:clamp(15px,1.25vw,23px);font-weight:700;color:#F1EFE8;line-height:1.2}
+.nd span small{display:block;font-size:.72em;font-weight:500;color:rgba(241,239,232,.58);margin-top:.2vh}
+.nd b{font-size:clamp(20px,1.8vw,34px);font-weight:900;color:#C0DD97;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.nd>div>i{font-style:normal;font-size:clamp(12px,.95vw,18px);font-weight:600;color:rgba(241,239,232,.65);line-height:1.2}
+.nd .ndsp b{color:#F5B65A}
+.bh .col{justify-content:center !important}
+.bh .col:has(.nd){gap:1.7vh;padding-top:3.2vh;padding-bottom:3.2vh}
+.bh .col:has(.nd) .pkt td{padding:.85vh 0}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
 .big .lbuso .br{grid-template-columns:minmax(220px,1fr) 4fr 200px;font-size:17px}
@@ -1686,21 +1697,25 @@ function renderPres(){
   </div>
  </section>`;})()}
  <section class="sl">${num(9)}
-  <p class="kick">Alternativa de contratación</p>
-  <h2>Bolsa de horas: <em>paquete base + spot</em></h2>
+  <p class="kick">Licitación por paquete de necesidades</p>
   ${(()=>{const st=stats(MODELS[0]),h=st.tot*52,spH=tH*0.10,avg=BASE_COST/tH;
    const fm=v=>v>=1e6?'$'+(v/1e6).toFixed(2)+'M':'$'+Math.round(v/1000)+'k';
    const fila=r=>{const rr=r===187?avg:r,pq=h*rr,sp=spH*rr,t=pq+sp,sv=BASE_COST-t;return `<tr${r===187?' class="pkref"':''}><td>$${r}/h${r===187?' <small>actual</small>':''}</td><td class="n">${fm(pq)}</td><td class="n">${fm(sp)}</td><td class="n">${fm(t)}</td><td class="n"><b>${fm(sv)}</b> <small>${p0(sv/BASE_COST*100)}</small></td></tr>`;};
    return `<div class="g2 bh">
    <div class="col"><h3>Cómo funciona</h3>
-    ${row('01','<b>Se define la línea base</b>','Horarios, personas estimadas y horas de navegación, tomados del modelo')}
+    ${row('01','<b>Se toma la línea base del modelo</b>','Es la base de la licitación: horas de navegación, tipo de viaje y cantidad de pasajeros')}
     ${row('02','<b>El proveedor cotiza el paquete</b>','Propone la flota con la que cumple esa línea base')}
     ${row('03','<b>Lo que queda fuera es spot</b>','Se paga por hora, con un precio negociado de antemano')}
    </div>
    <div class="col"><h3>Paquete a cotizar</h3>
-    <div class="pk3 pk4"><div><b>${nfp(st.tot)} h</b><small>por semana</small></div><div><b>${st.vt}</b><small>viajes por semana</small></div><div><b>10 a 44</b><small>pax por viaje o carga hasta 6 t</small></div><div class="pksp"><b>+10%</b><small>spot: ${nfp(spH)} h/año a precio negociado</small></div></div>
+    <div class="nd">
+     <div><span>Horas de navegación<small>${nfp(h)} h al año</small></span><b>${nfp(st.tot)} h</b><i>por semana</i></div>
+     <div><span>Tipo de viaje<small>relevos, rondas y materiales</small></span><b>${st.vt}</b><i>viajes por semana</i></div>
+     <div><span>Cantidad de pasajeros<small>o carga hasta 6 t</small></span><b>10 a 44</b><i>por viaje</i></div>
+     <div class="ndsp"><span>Spot<small>a precio negociado</small></span><b>+10%</b><i>${nfp(spH)} h al año</i></div>
+    </div>
     <table class="pkt"><thead><tr><th>Tarifa</th><th class="n">Paquete</th><th class="n">Spot</th><th class="n">Total</th><th class="n">Ahorro</th></tr></thead><tbody>${[187,175,165].map(fila).join('')}</tbody></table>
-    <p class="pkn">Valores anuales. Costo actual ${fm(BASE_COST)}. Paquete: ${nfp(h)} h; spot: ${nfp(spH)} h (10% de las horas actuales), a la misma tarifa.</p>
+    <p class="pkn">Valores anuales a cada tarifa por hora, con el spot a la misma tarifa. Costo actual ${fm(BASE_COST)}.</p>
    </div>
   </div>`;})()}
  </section>`;})()}
@@ -1716,7 +1731,7 @@ function renderPres(){
  <section class="sl">${num(11)}
   <p class="kick">Próximos pasos</p>
   <div class="col cons5">
-   ${row('01','<b>Definir la forma de contratación</b>','Time Charter o bolsa de horas con spot')}
+   ${row('01','<b>Definir la forma de contratación</b>','Time Charter o licitación por paquete de necesidades con spot')}
    ${row('02','<b>Preparar la solicitud de cotización</b>','Entregar la línea base (horarios, personas, horas y capacidades) a Arpón y BSS')}
    ${row('03','<b>Evaluar las ofertas</b>','Comparar contra el costo actual y el punto de equilibrio de '+money(BASE_COST*0.9/365)+' por día')}
    ${row('04','<b>Preparar la implementación</b>','Designar al coordinador, definir la herramienta de reservas y medir la cobertura mensualmente')}
