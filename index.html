@@ -706,6 +706,13 @@ html.pmode .pexit:hover{opacity:1}
 .pkt tr.pkref td:last-child{border-right:1px solid rgba(192,221,151,.45);border-radius:0 12px 12px 0;padding-right:.8vw}
 .pkt tr.pkref td small{color:#C0DD97;font-weight:700}
 .pkt{border-collapse:separate;border-spacing:0}
+.ar7s .arl{justify-content:center;gap:1.6vh}
+.ar7s .arl .art td{padding:1.1vh 0}
+.arh{margin-top:.8vh}
+.art.arf{font-size:clamp(12px,1.05vw,20px)}
+.art.arf td{padding:.75vh 0 !important;font-weight:600}
+.art.arf tr.artot td{border-top:1px solid rgba(255,255,255,.25);font-weight:900;color:#fff}
+.ar7s .arc{gap:.8vh}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
 .big .lbuso .br{grid-template-columns:minmax(220px,1fr) 4fr 200px;font-size:17px}
@@ -1640,17 +1647,23 @@ function renderPres(){
   <p class="kick">Propuesta de Arpón: Time Charter</p>
   <div class="ar7">
    <div class="col arl">
-    <span class="cvt">Propuesta recibida, tarifa sin negociar</span>
-    <table class="art"><thead><tr><th>Embarcación</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Drums</th><th class="n">gal/h</th><th class="n">Día</th><th class="n">Mes</th></tr></thead><tbody>
-     <tr><td>Perseverance</td><td class="n">29</td><td class="n">5 t</td><td class="n">20</td><td class="n">48 a 52</td><td class="n">$750</td><td class="n">$22,500</td></tr>
-     <tr><td>Arpón 1</td><td class="n">18</td><td class="n">6 t</td><td class="n">30</td><td class="n">40.2</td><td class="n">$750</td><td class="n">$22,500</td></tr>
-     <tr><td>Infinity</td><td class="n">18</td><td class="n">6 t</td><td class="n">20</td><td class="n">40.2</td><td class="n">$750</td><td class="n">$22,500</td></tr>
+    <span class="cvt">Tarifa sin negociar, sin combustible</span>
+    <table class="art"><thead><tr><th>Embarcación</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Drums</th><th class="n">Día</th><th class="n">Mes</th></tr></thead><tbody>
+     <tr><td>Perseverance</td><td class="n">29</td><td class="n">5 t</td><td class="n">20</td><td class="n">$750</td><td class="n">$22,500</td></tr>
+     <tr><td>Arpón 1</td><td class="n">18</td><td class="n">6 t</td><td class="n">30</td><td class="n">$750</td><td class="n">$22,500</td></tr>
+     <tr><td>Infinity</td><td class="n">18</td><td class="n">6 t</td><td class="n">20</td><td class="n">$750</td><td class="n">$22,500</td></tr>
     </tbody></table>
     <ul class="arc">
-     <li><b>Disponibles 24/7, los 365 días:</b> las lanchas quedan listas para cuando se necesiten, con capitán y marino incluidos</li>
+     <li><b>Disponibles 24/7:</b> listas cuando se necesiten, con capitán y marino incluidos</li>
      <li><b>Reemplazo de la nave</b> si falla o entra a mantenimiento</li>
-     <li><b>Sin combustible:</b> se carga en Flamenco Marina. Motores: Perseverance 2 × 480 HP; Arpón 1 e Infinity 2 × 385 HP</li>
     </ul>
+    <span class="cvt arh">Horas y combustible: ${nfp(hT)} h ÷ 3 lanchas</span>
+    <table class="art arf"><thead><tr><th>Embarcación</th><th class="n">Motores</th><th class="n">Horas al año</th><th class="n">gal/h</th><th class="n">Galones</th><th class="n">Toneladas</th></tr></thead><tbody>
+     <tr><td>Perseverance</td><td class="n">2 × 480 HP</td><td class="n">${nfp(hT/3)}</td><td class="n">50</td><td class="n">${nfp(hT/3*GP)}</td><td class="n">${nfp(hT/3*GP*KGG/1000)} t</td></tr>
+     <tr><td>Arpón 1</td><td class="n">2 × 385 HP</td><td class="n">${nfp(hT/3)}</td><td class="n">40.2</td><td class="n">${nfp(hT/3*GA)}</td><td class="n">${nfp(hT/3*GA*KGG/1000)} t</td></tr>
+     <tr><td>Infinity</td><td class="n">2 × 385 HP</td><td class="n">${nfp(hT/3)}</td><td class="n">40.2</td><td class="n">${nfp(hT/3*GA)}</td><td class="n">${nfp(hT/3*GA*KGG/1000)} t</td></tr>
+     <tr class="artot"><td>Total</td><td class="n"></td><td class="n">${nfp(hT)}</td><td class="n"></td><td class="n">${nfp(gal)}</td><td class="n">${nfp(ft)} t</td></tr>
+    </tbody></table>
    </div>
    <div class="col arr">
     <span class="cvt">Costo anual estimado</span>
@@ -1662,7 +1675,7 @@ function renderPres(){
      <div class="lr lsv${neg?' lng':''}"><i>=</i><span>${neg?'Costo adicional':'Ahorro estimado'}<small>${p0(Math.abs(ah)/BASE_COST*100)} ${neg?'más':'menos'} que hoy</small></span><b>${neg?'+':''}${kf(Math.abs(ah))}</b></div>
     </div>
     <div class="pdx"><div class="pdb pdr${tot/365>eq?' png':''}"><small>Arpón / día</small><b>${money(tot/365)}</b><span>con combustible</span></div><div class="pdb"><small>Equilibrio / día</small><b>${money(eq)}</b><span>precio máximo</span></div><div class="pdb"><small>Hoy / día</small><b>${money(BASE_COST/365)}</b><span>costo actual</span></div></div>
-    <p class="pen">Consumo informado por Arpón. Cada lancha hace un tercio de las ${nfp(hT)} h del modelo y el spot (${nfp(hT/3)} h). Es un techo: con motores apagados en espera, baja.</p>
+    <p class="pen">Consumo informado por Arpón (Perseverance: 48 a 52 gal/h, se usa 50). Es un techo: con motores apagados en espera, baja. 1 t = 314 gal.</p>
    </div>
   </div>
  </section>`;})()}
