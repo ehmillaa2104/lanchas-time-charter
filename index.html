@@ -683,6 +683,13 @@ html.pmode .pexit:hover{opacity:1}
 .lr.lsv.lng>b{background:none;color:#EF9F27;-webkit-text-fill-color:#EF9F27}
 .pdb.pdr.png{border-color:rgba(239,159,39,.55);background:rgba(239,159,39,.08)}
 .pdb.pdr.png b{background:none;color:#EF9F27;-webkit-text-fill-color:#EF9F27}
+.pat{gap:0 !important}
+.pat .cvt{margin-bottom:.8vh}
+.ptr{display:grid;grid-template-columns:minmax(0,.95fr) clamp(110px,8.4vw,160px) minmax(0,2.1fr);align-items:center;column-gap:1.4vw;padding:1.05vh 0;border-top:1px solid rgba(255,255,255,.08)}
+.ptm{font-style:normal;font-size:clamp(26px,2.3vw,44px);font-weight:900;line-height:1;letter-spacing:-.02em;color:#F1EFE8;white-space:nowrap}
+.ptm.ptx{font-size:clamp(17px,1.45vw,27px);letter-spacing:0;color:var(--ac1)}
+.ptp{margin:0;font-size:clamp(13px,1.08vw,20px);color:rgba(241,239,232,.78);line-height:1.35}
+.pat .tkt{font-size:clamp(17px,1.45vw,27px)}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
 .big .lbuso .br{grid-template-columns:minmax(220px,1fr) 4fr 200px;font-size:17px}
@@ -1568,6 +1575,7 @@ function renderPres(){
  ${(()=>{const pl=MODELS[0].plan,DS=[0,1,2,3,4,5,6],WE=[5,6];
   const hrs=(k,days,a,b)=>days.reduce((t,d)=>t+pl[d][k].filter(e=>!e[6]).reduce((u,e)=>u+Math.max(0,Math.min(e[1],b)-Math.max(e[0],a)),0),0);
   const u=(k,days,a,b)=>Math.round(hrs(k,days,a,b)/(days.length*(b-a))*100);
+  const mdE=pl.flatMap(d=>d.a.filter(e=>!e[6]&&e[2]==='Ronda mediodía')),mdP=mdE.length?(+mdE[0][7]||10):10;
   const l1n=u('a',DS,18,24),l2we=u('b',WE,6,18),weT=Math.round((hrs('a',WE,6,24)+hrs('b',WE,6,24))/(WE.length*36)*100);
   const eq=BASE_COST*0.9/365;
   const CAT=LB_DATA.categorias,va=CAT.reduce((a,c)=>a+c.viajes_anio,0);
@@ -1589,17 +1597,20 @@ function renderPres(){
     </div>
     <p class="pen">La tarifa debe incluir el combustible, igual que el costo actual. Por debajo de este valor, el charter cuesta menos que la operación de hoy.</p>
    </div>
-   <div class="col tkg2">
-    <div class="tkh"><span>Tema</span><span>Situación actual</span><span></span><span>Propuesta</span></div>
-    <div class="tkr"><b class="tkt"><span class="tkn">01</span>Horario contratado</b>
-     <div class="tkm"><em>${l1n}%</em><span>de uso de la lancha de 44 después de las 18:00</span></div><i>→</i>
-     <p class="tkp">Contratar 12 horas, de 6:00 a 18:00</p></div>
-    <div class="tkr"><b class="tkt"><span class="tkn">02</span>Fin de semana</b>
-     <div class="tkm"><em>${weT}%</em><span>de uso de las dos lanchas el sábado y domingo</span></div><i>→</i>
-     <p class="tkp">Una sola lancha en charter</p></div>
-    <div class="tkr"><b class="tkt"><span class="tkn">03</span>Combustible</b>
-     <div class="tkm"><em class="tkx">Incluido</em><span>en el costo actual de las lanchas</span></div><i>→</i>
-     <p class="tkp">Pedir tarifas con combustible incluido</p></div>
+   <div class="col tkg2 pat">
+    <span class="cvt">Puntos de atención</span>
+    <div class="ptr"><b class="tkt"><span class="tkn">01</span>Combustible</b>
+     <em class="ptm ptx">Proveedor</em>
+     <p class="ptp">El combustible debe ir en la tarifa, calculado por el proveedor según los viajes. Si lo ponen MOTI y TT, no hay forma de controlar cuánto se consume.</p></div>
+    <div class="ptr"><b class="tkt"><span class="tkn">02</span>Lancha de 44 de noche</b>
+     <em class="ptm">${l1n}%</em>
+     <p class="ptp">de uso entre semana después de las 18:00. Se puede contratar 12 horas, de 6:00 a 18:00.</p></div>
+    <div class="ptr"><b class="tkt"><span class="tkn">03</span>Fin de semana</b>
+     <em class="ptm">${weT}%</em>
+     <p class="ptp">de uso de las lanchas el sábado y domingo. Evaluar una sola lancha esos días.</p></div>
+    <div class="ptr"><b class="tkt"><span class="tkn">04</span>Lancha sobredimensionada</b>
+     <em class="ptm">${p0(mdP/44*100)}</em>
+     <p class="ptp">de ocupación en la ronda de media mañana (${mdP} de 44 puestos). Con solo dos lanchas, la grande hace viajes con pocas personas y consume casi lo mismo que llena.</p></div>
    </div>
   </div>
  </section>
