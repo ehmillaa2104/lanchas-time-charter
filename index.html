@@ -940,9 +940,7 @@ MODELS.forEach(m=>m.plan.forEach(p=>p.b.push(REL22)));
 function pack(list){const rows=[];[...list].sort((x,y)=>x[0]-y[0]).forEach(e=>{const r=rows.find(r=>r[r.length-1][1]<=e[0]);r?r.push(e):rows.push([e]);});return rows;}
 function paxOf(e){return e[6]?0:e[2]==='Relevo TT'?44:e[2]==='Relevo MOTI'?(e[0]===22?20:44):e[2]==='Ronda mediodía'?10:e[2].startsWith('Ronda')?20:e[2]==='Materiales'?5:0;}
 MODELS.forEach(m=>m.plan.forEach(p=>['a','b','t'].forEach(k=>{if(p[k])p[k]=p[k].map(e=>{const c=[...e];c[6]=c[6]||0;c[7]=paxOf(c);return c;});})));
-// Copia fuera de la página publicada: arranca con el horario guardado (19 nov 2026).
 const SAVED_PLAN=[[{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9.5,13.5,"Relevo TT","9:30–13:30",1,"T",0,44],[17,24,"Opción relevo TT","desde las 17:00",1,"",1,0]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[9.75,13.25,"Relevo TT","9:45–13:15",1,"T",0,10]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44]],"b":[[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[],"b":[[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,20],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,20]]}]];
-try{if(Array.isArray(SAVED_PLAN)&&SAVED_PLAN.length>=MODELS.length)MODELS.forEach((m,i)=>{m.plan=SAVED_PLAN[i];});}catch(err){}
 const ORIG=JSON.stringify(MODELS.map(m=>m.plan));
 const KEY='lanchas-v58';
 try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(Array.isArray(d)&&d.length>=MODELS.length)MODELS.forEach((m,i)=>{m.plan=d[i];});}catch(err){}
@@ -1548,32 +1546,7 @@ function renderPres(){
    <li>Gerardo Bósquez</li><li>César Miranda</li><li>Riogel Pérez</li>
   </ul></div>
  </section>
- <section class="sl cmp">${num(2)}
-  <p class="kick">Comparativo de alternativas</p>
-  <div class="cmw">
-  ${(()=>{const pl=MODELS[0].plan,sh=k=>pl.reduce((t,d)=>t+d[k].filter(e=>!e[6]).reduce((u,e)=>u+e[1]-e[0],0),0)*52;
-   const h1=sh('a'),h2=sh('b'),hs=tH*0.10,hT=h1+h2+hs,s1=h1/(h1+h2),avg=BASE_COST/tH,FC=0.7,PG=6,MES=22500;
-   const A={ch:MES*3*12,fc:hT/3*(50+40.2+40.2)*FC*PG};A.t=A.ch+A.fc+COORD;   // propuesta de Arpón (diapositiva 8)
-   const B={ch:MES*2*12,fc:(hT*s1*50+hT*(1-s1)*40.2)*FC*PG};B.t=B.ch+B.fc+COORD;   // estimado 2 lanchas (diapositiva 9)
-   const C={ch:hT*avg};C.t=C.ch+COORD;   // paquete por horas a la tarifa actual (diapositiva 10)
-   const dif=t=>{const d=t-BASE_COST;return d>0?`<b class="cup">+${kf(d)}</b><small>${p0(d/BASE_COST*100)} más</small>`:`<b class="cdn">−${kf(-d)}</b><small>${p0(-d/BASE_COST*100)} menos</small>`;};
-   const lim=(BASE_COST-COORD)/365/2;
-   return `<table class="cmt"><thead><tr><th></th><th>Hoy</th><th>Time Charter Arpón<small>3 lanchas, propuesta</small></th><th>Time Charter<small>2 lanchas, estimado</small></th><th class="best">Paquete por horas<small>licitación</small></th></tr></thead><tbody>
-    <tr><td>Cómo se contrata</td><td>Por hora, a pedido</td><td>$22,500 al mes por lancha</td><td>$22,500 al mes por lancha</td><td class="best">${money(avg)}/h, el proveedor pone la flota</td></tr>
-    <tr><td>Horas al año</td><td>${nfp(tH)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td class="best">${nfp(hT)}</td></tr>
-    <tr><td>Lanchas u horas</td><td>${kf(BASE_COST)}</td><td>${kf(A.ch)}</td><td>${kf(B.ch)}</td><td class="best">${kf(C.ch)}</td></tr>
-    <tr><td>Diésel<small>$6 el galón, consumo al 70%</small></td><td>Incluido</td><td>${kf(A.fc)}</td><td>${kf(B.fc)}</td><td class="best">Incluido</td></tr>
-    <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td class="best">${kf(COORD)}</td></tr>
-    <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td>${kf(A.t)}</td><td>${kf(B.t)}</td><td class="best">${kf(C.t)}</td></tr>
-    <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(A.t)}</td><td>${dif(B.t)}</td><td class="best">${dif(C.t)}</td></tr>
-    <tr><td>Costo por día</td><td>${money(BASE_COST/365)}</td><td>${money(A.t/365)}</td><td>${money(B.t/365)}</td><td class="best">${money(C.t/365)}</td></tr>
-    <tr><td>Riesgo del consumo de diésel</td><td>Proveedor</td><td>MOTI y TT</td><td>MOTI y TT</td><td class="best">Proveedor</td></tr>
-    <tr><td>Disponibilidad</td><td>A pedido</td><td>3 lanchas 24/7</td><td>2 lanchas 24/7</td><td class="best">Horario programado y spot</td></tr>
-   </tbody></table>
-   <div class="crec"><b>Recomendación:</b> licitar el paquete por horas. El Time Charter solo conviene si el proveedor incluye el diésel y cobra menos de ${money(lim)} por lancha al día.</div>`;})()}
-  </div>
- </section>
- <section class="sl">${num(3)}
+ <section class="sl">${num(2)}
   <p class="kick">Requerimientos principales</p>
   <div class="g2 req">
    <div class="col">
@@ -1588,7 +1561,7 @@ function renderPres(){
    </div>
   </div>
  </section>
- <section class="sl">${num(4)}
+ <section class="sl">${num(3)}
   <p class="kick">Consideraciones</p>
   <div class="col cons5">
    ${row('01','<b>Evitar sobretiempo y costos adicionales</b>','Los cambios de horario y de operación no deben generar gastos nuevos')}
@@ -1597,7 +1570,7 @@ function renderPres(){
    ${row('04','<b>Comanche fuera del análisis</b>','Su costo no entra en el estudio, pero puede apoyar la operación en emergencias, traslados de emergencia, buceo y spot')}
   </div>
  </section>
- <section class="sl s4">${num(5)}
+ <section class="sl s4">${num(4)}
   <p class="kick">Situación actual · agosto 2025 a julio 2026</p>
   <div class="g3 kp3">
    <div class="cx"><span class="lbk">Costo anual</span><span class="nn">${mil(tC)}</span><small style="white-space:nowrap">MOTI y Trader Tanker <span class="pill">Sin Comanche</span></small></div>
@@ -1608,7 +1581,7 @@ function renderPres(){
   <div class="lgd"><span><i class="sbb"></i>Fijo: relevos MOTI, relevo de tripulantes TT, materiales y comida</span><span><i class="sbv"></i>Variable: contratistas MOTI, movimientos de tripulantes, técnicos, urgencias y traspasos</span></div>
   <div class="g2 chs ch2x">${dona('MOTI','Melones (MOTI)')}${dona('TT','Trader Tanker')}</div>
  </section>
- <section class="sl cv2">${num(6)}
+ <section class="sl cv2">${num(5)}
   <p class="kick">Cobertura estimada</p>
   ${(()=>{const mH=stats(MODELS[0]).tot*52,sp=tH*0.10,nt=mH+sp,dif=tH-nt,w=v=>(v/tH*100).toFixed(1);
   return `<div class="cvtop cv3">
@@ -1639,6 +1612,31 @@ function renderPres(){
     ${row('04','<b>Charla de seguridad</b> en el Radisson','De 7:00 a 9:00')}
    </div>
   </div>`;})()}
+ </section>
+ <section class="sl cmp">${num(6)}
+  <p class="kick">Comparativo de alternativas</p>
+  <div class="cmw">
+  ${(()=>{const pl=MODELS[0].plan,sh=k=>pl.reduce((t,d)=>t+d[k].filter(e=>!e[6]).reduce((u,e)=>u+e[1]-e[0],0),0)*52;
+   const h1=sh('a'),h2=sh('b'),hs=tH*0.10,hT=h1+h2+hs,s1=h1/(h1+h2),avg=BASE_COST/tH,FC=0.7,PG=6,MES=22500;
+   const A={ch:MES*3*12,fc:hT/3*(50+40.2+40.2)*FC*PG};A.t=A.ch+A.fc+COORD;   // propuesta de Arpón (diapositiva 8)
+   const B={ch:MES*2*12,fc:(hT*s1*50+hT*(1-s1)*40.2)*FC*PG};B.t=B.ch+B.fc+COORD;   // estimado 2 lanchas (diapositiva 9)
+   const C={ch:hT*avg};C.t=C.ch+COORD;   // paquete por horas a la tarifa actual (diapositiva 10)
+   const dif=t=>{const d=t-BASE_COST;return d>0?`<b class="cup">+${kf(d)}</b><small>${p0(d/BASE_COST*100)} más</small>`:`<b class="cdn">−${kf(-d)}</b><small>${p0(-d/BASE_COST*100)} menos</small>`;};
+   const lim=(BASE_COST-COORD)/365/2;
+   return `<table class="cmt"><thead><tr><th></th><th>Hoy</th><th>Time Charter Arpón<small>3 lanchas, propuesta</small></th><th>Time Charter<small>2 lanchas, estimado</small></th><th class="best">Paquete por horas<small>licitación</small></th></tr></thead><tbody>
+    <tr><td>Cómo se contrata</td><td>Por hora, a pedido</td><td>$22,500 al mes por lancha</td><td>$22,500 al mes por lancha</td><td class="best">${money(avg)}/h, el proveedor pone la flota</td></tr>
+    <tr><td>Horas al año</td><td>${nfp(tH)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td class="best">${nfp(hT)}</td></tr>
+    <tr><td>Lanchas u horas</td><td>${kf(BASE_COST)}</td><td>${kf(A.ch)}</td><td>${kf(B.ch)}</td><td class="best">${kf(C.ch)}</td></tr>
+    <tr><td>Diésel<small>$6 el galón, consumo al 70%</small></td><td>Incluido</td><td>${kf(A.fc)}</td><td>${kf(B.fc)}</td><td class="best">Incluido</td></tr>
+    <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td class="best">${kf(COORD)}</td></tr>
+    <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td>${kf(A.t)}</td><td>${kf(B.t)}</td><td class="best">${kf(C.t)}</td></tr>
+    <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(A.t)}</td><td>${dif(B.t)}</td><td class="best">${dif(C.t)}</td></tr>
+    <tr><td>Costo por día</td><td>${money(BASE_COST/365)}</td><td>${money(A.t/365)}</td><td>${money(B.t/365)}</td><td class="best">${money(C.t/365)}</td></tr>
+    <tr><td>Riesgo del consumo de diésel</td><td>Proveedor</td><td>MOTI y TT</td><td>MOTI y TT</td><td class="best">Proveedor</td></tr>
+    <tr><td>Disponibilidad</td><td>A pedido</td><td>3 lanchas 24/7</td><td>2 lanchas 24/7</td><td class="best">Horario programado y spot</td></tr>
+   </tbody></table>
+   <div class="crec"><b>Recomendación:</b> licitar el paquete por horas. El Time Charter solo conviene si el proveedor incluye el diésel y cobra menos de ${money(lim)} por lancha al día.</div>`;})()}
+  </div>
  </section>
  ${(()=>{const pl=MODELS[0].plan,DS=[0,1,2,3,4,5,6],WE=[5,6];
   const hrs=(k,days,a,b)=>days.reduce((t,d)=>t+pl[d][k].filter(e=>!e[6]).reduce((u,e)=>u+Math.max(0,Math.min(e[1],b)-Math.max(e[0],a)),0),0);
