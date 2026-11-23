@@ -1509,7 +1509,7 @@ function lbCalc(mi){
 // Pestaña Presentación: resumen para mostrar en TV, letras grandes.
 function renderPres(){
  ['.keys','#hsub','#st'].forEach(q=>{const el=document.querySelector(q);if(el)el.style.display='none';});
- const n=7,nA=4,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
+ const n=6,nA=4,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
  const numA=i=>`<span class="bar" style="right:17vw"><i style="width:${i/nA*100}%"></i></span><span class="num">ANEXO ${i} / ${nA}</span>`;
  const card=(nn,html)=>`<div class="cx"><span class="nn">${nn}</span><div>${html}</div></div>`;
  const row=(nn,t,sub)=>`<div class="rw"><span class="nn">${nn}</span><div>${t}<small>${sub}</small></div></div>`;
@@ -1532,7 +1532,7 @@ function renderPres(){
    <div class="dnl"><div><i class="sbb"></i><span>Fijo<b>${p0(bh/th*100)}</b><small><span class="mny">${kf(bc)}</span> · ${nfp(bh)} h</small></span></div>${vh?`<div><i class="sbv"></i><span>Variable<b>${p0(vh/th*100)}</b><small><span class="mny">${kf(vc)}</span> · ${nfp(vh)} h</small></span></div>`:''}</div></div></div>`;};
  const tH=agg(null,null,'horas_anio'),tC=agg(null,null,'costo_anio'),bH=agg(null,'Línea base','horas_anio'),bC=agg(null,'Línea base','costo_anio');
  return `<div class="pres"><div class="pbar"><button class="pgo" data-pmode="1">▶ Presentar en pantalla completa</button><span>Flechas o barra espaciadora para avanzar · Esc para salir</span></div>
- <section class="sl cover">${num(1)}
+ <section class="sl cover">${num(0)}
   <div class="cv">
    <h1>Estudio de lanchas: <em>Time Charter</em></h1>
    <p class="lead">Propuesta de un sistema de lanchas nuevo y compartido entre las dos compañías</p>
@@ -1543,7 +1543,7 @@ function renderPres(){
    <li>Gerardo Bósquez</li><li>César Miranda</li><li>Riogel Pérez</li><li>Juan Camilo Reyes</li>
   </ul></div>
  </section>
- <section class="sl">${num(2)}
+ <section class="sl">${num(1)}
   <p class="kick">Requerimientos principales</p>
   <div class="g2 req">
    <div class="col">
@@ -1558,7 +1558,7 @@ function renderPres(){
    </div>
   </div>
  </section>
- <section class="sl">${num(3)}
+ <section class="sl">${num(2)}
   <p class="kick">Consideraciones</p>
   <div class="col cons5">
    ${row('01','<b>Evitar sobretiempo y costos adicionales</b>','Los cambios de horario y de operación no deben generar gastos nuevos')}
@@ -1567,7 +1567,7 @@ function renderPres(){
    ${row('04','<b>Comanche fuera del análisis</b>','Su costo no entra en el estudio, pero puede apoyar la operación en emergencias, traslados de emergencia, buceo y spot')}
   </div>
  </section>
- <section class="sl s4">${num(4)}
+ <section class="sl s4">${num(3)}
   <p class="kick">Situación actual · agosto 2025 a julio 2026</p>
   <div class="g3 kp3">
    <div class="cx"><span class="lbk">Costo anual</span><span class="nn">${mil(tC)}</span><small style="white-space:nowrap">MOTI y Trader Tanker <span class="pill">Sin Comanche</span></small></div>
@@ -1578,7 +1578,7 @@ function renderPres(){
   <div class="lgd"><span><i class="sbb"></i>Fijo: relevos MOTI, relevo de tripulantes TT, materiales y comida</span><span><i class="sbv"></i>Variable: contratistas MOTI, movimientos de tripulantes, técnicos, urgencias y traspasos</span></div>
   <div class="g2 chs ch2x">${dona('MOTI','Melones (MOTI)')}${dona('TT','Trader Tanker')}</div>
  </section>
- <section class="sl cv2">${num(5)}
+ <section class="sl cv2">${num(4)}
   <p class="kick">Cobertura estimada</p>
   ${(()=>{const mH=stats(MODELS[0]).tot*52,sp=tH*0.10,nt=mH+sp,dif=tH-nt,w=v=>(v/tH*100).toFixed(1);
   return `<div class="cvtop cv3">
@@ -1610,7 +1610,7 @@ function renderPres(){
    </div>
   </div>`;})()}
  </section>
- <section class="sl cmp">${num(6)}
+ <section class="sl cmp">${num(5)}
   <p class="kick">Comparativo de alternativas</p>
   <div class="cmw">
   ${(()=>{const pl=MODELS[0].plan,sh=k=>pl.reduce((t,d)=>t+d[k].filter(e=>!e[6]).reduce((u,e)=>u+e[1]-e[0],0),0)*52;
@@ -1634,7 +1634,7 @@ function renderPres(){
    </tbody></table>`;})()}
   </div>
  </section>
- <section class="sl">${num(7)}
+ <section class="sl">${num(6)}
   <p class="kick">Recomendaciones para implementar</p>
   <div class="g2 prf rec tc">
    ${card('01',`<b>Coordinador logístico</b><small>Con autoridad para asignar lanchas y definir rutas de MOTI y Trader Tanker. Comanche y spot, solo en casos excepcionales.</small>`)}
