@@ -1509,7 +1509,8 @@ function lbCalc(mi){
 // Pestaña Presentación: resumen para mostrar en TV, letras grandes.
 function renderPres(){
  ['.keys','#hsub','#st'].forEach(q=>{const el=document.querySelector(q);if(el)el.style.display='none';});
- const n=12,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
+ const n=7,nA=4,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
+ const numA=i=>`<span class="bar" style="right:17vw"><i style="width:${i/nA*100}%"></i></span><span class="num">ANEXO ${i} / ${nA}</span>`;
  const card=(nn,html)=>`<div class="cx"><span class="nn">${nn}</span><div>${html}</div></div>`;
  const row=(nn,t,sub)=>`<div class="rw"><span class="nn">${nn}</span><div>${t}<small>${sub}</small></div></div>`;
  const CVp=lbCalc(0),ttc=CVp.cob.find(r=>r.demanda==='Total TT')||{en_horario:0,mismo_dia:0};
@@ -1614,9 +1615,9 @@ function renderPres(){
   <div class="cmw">
   ${(()=>{const pl=MODELS[0].plan,sh=k=>pl.reduce((t,d)=>t+d[k].filter(e=>!e[6]).reduce((u,e)=>u+e[1]-e[0],0),0)*52;
    const h1=sh('a'),h2=sh('b'),hs=tH*0.10,hT=h1+h2+hs,s1=h1/(h1+h2),avg=BASE_COST/tH,NEG=175,FC=0.7,PG=6,MES=22500;
-   const A={ch:MES*3*12,fc:hT/3*(50+40.2+40.2)*FC*PG};A.t=A.ch+A.fc+COORD;   // propuesta de Arpón (diapositiva 8)
-   const B={ch:MES*2*12,fc:(hT*s1*50+hT*(1-s1)*40.2)*FC*PG};B.t=B.ch+B.fc+COORD;   // estimado 2 lanchas (diapositiva 9)
-   const C={ch:hT*avg};C.t=C.ch+COORD;   // paquete por horas a la tarifa actual (diapositiva 10)
+   const A={ch:MES*3*12,fc:hT/3*(50+40.2+40.2)*FC*PG};A.t=A.ch+A.fc+COORD;   // propuesta de Arpón (anexo 2)
+   const B={ch:MES*2*12,fc:(hT*s1*50+hT*(1-s1)*40.2)*FC*PG};B.t=B.ch+B.fc+COORD;   // estimado 2 lanchas (anexo 3)
+   const C={ch:hT*avg};C.t=C.ch+COORD;   // paquete por horas a la tarifa actual (anexo 4)
    const D={ch:hT*NEG};D.t=D.ch+COORD;   // paquete por horas negociado a $175/h
    const cl=t=>t>BASE_COST?'cup':'cdn';
    const tot=t=>`<b class="${cl(t)}">${kf(t)}</b>`;
@@ -1633,6 +1634,15 @@ function renderPres(){
    </tbody></table>`;})()}
   </div>
  </section>
+ <section class="sl">${num(7)}
+  <p class="kick">Recomendaciones para implementar</p>
+  <div class="g2 prf rec tc">
+   ${card('01',`<b>Coordinador logístico</b><small>Con autoridad para asignar lanchas y definir rutas de MOTI y Trader Tanker. Comanche y spot, solo en casos excepcionales.</small>`)}
+   ${card('02',`<b>Operación programada</b><small>El modelo funciona con horarios programados. Cada área planifica sus traslados en función de las rondas, con un tiempo de antelación.</small>`)}
+   ${card('03',`<b>Herramienta digital de reservas</b><small>Cronograma de lanchas con reserva de cupos. Idealmente integrada con MarineTraffic para calcular rutas óptimas según la posición de los barcos.</small>`)}
+   ${card('04',`<b>Logística de materiales e insumos</b><small>Consolidar los pedidos de materiales, insumos y consumibles para aprovechar cada viaje y extender la autonomía de los barcos entre entregas.</small>`)}
+  </div>
+ </section>
  ${(()=>{const pl=MODELS[0].plan,DS=[0,1,2,3,4,5,6],WE=[5,6];
   const hrs=(k,days,a,b)=>days.reduce((t,d)=>t+pl[d][k].filter(e=>!e[6]).reduce((u,e)=>u+Math.max(0,Math.min(e[1],b)-Math.max(e[0],a)),0),0);
   const u=(k,days,a,b)=>Math.round(hrs(k,days,a,b)/(days.length*(b-a))*100);
@@ -1640,7 +1650,7 @@ function renderPres(){
   const l1n=u('a',DS,18,24),l2we=u('b',WE,6,18),weT=Math.round((hrs('a',WE,6,24)+hrs('b',WE,6,24))/(WE.length*36)*100);
   const eq=BASE_COST/365;   // punto de equilibrio: costo actual ÷ 365 (Esteban, 23 nov 2026)
   const CAT=LB_DATA.categorias,va=CAT.reduce((a,c)=>a+c.viajes_anio,0);
-  return `<section class="sl tc6s">${num(7)}
+  return `<section class="sl tc6s">${numA(1)}
   <p class="kick">Time Charter: qué evaluar</p>
   <div class="tc7">
    <div class="col pe2">
@@ -1677,7 +1687,7 @@ function renderPres(){
   // Combustible a $6 por galón y al 70% del consumo máximo informado (Esteban, 23 nov 2026).
   const GP=50,GA=40.2,FC=0.70,PG=6,MES=22500,NL=3,hL=hT/3;
   const gal=hL*(GP+GA+GA)*FC,fc=gal*PG,ch=MES*NL*12,tot=ch+fc+COORD,ah=BASE_COST-tot,neg=ah<0;
-  return `<section class="sl ar7s">${num(8)}
+  return `<section class="sl ar7s">${numA(2)}
   <p class="kick">Propuesta de Arpón: Time Charter</p>
   <div class="ar7">
    <div class="col arl">
@@ -1720,7 +1730,7 @@ function renderPres(){
   // (50 gal/h) y lancha de carga como Arpón 1 (40.2 gal/h), con los datos que informó Arpón.
   const G1=50,G2=40.2,FC=0.70,PG=6,MES=22500,NL=2;   // $6 por galón, al 70% del consumo máximo; precio mensual como Arpón (Esteban, 23 nov 2026)
   const gal=(H1*G1+H2*G2)*FC,fc=gal*PG,ch=MES*NL*12,tot=ch+fc+COORD,ah=BASE_COST-tot,neg=ah<0;
-  return `<section class="sl ar7s">${num(9)}
+  return `<section class="sl ar7s">${numA(3)}
   <p class="kick">Estimación: 2 lanchas en Time Charter</p>
   <div class="ar7">
    <div class="col arl">
@@ -1750,7 +1760,7 @@ function renderPres(){
    </div>
   </div>
  </section>`;})()}
- <section class="sl">${num(10)}
+ <section class="sl">${numA(4)}
   <p class="kick">Licitación por paquete de necesidades</p>
   ${(()=>{const st=stats(MODELS[0]),h=st.tot*52,spH=tH*0.10,avg=BASE_COST/tH;
    const fm=v=>v>=1e6?'$'+(v/1e6).toFixed(2)+'M':'$'+Math.round(v/1000)+'k';
@@ -1773,24 +1783,6 @@ function renderPres(){
    </div>
   </div>`;})()}
  </section>`;})()}
- <section class="sl">${num(11)}
-  <p class="kick">Recomendaciones para implementar</p>
-  <div class="g2 prf rec tc">
-   ${card('01',`<b>Coordinador de logística</b><small>Con autoridad para asignar lanchas y definir rutas de MOTI y Trader Tanker. Comanche y spot, solo en casos excepcionales.</small>`)}
-   ${card('02',`<b>Operación programada</b><small>El modelo funciona con horarios programados. Cada área planifica sus traslados en función de las rondas, con un tiempo de antelación.</small>`)}
-   ${card('03',`<b>Herramienta digital de reservas</b><small>Cronograma de lanchas con reserva de cupos. Idealmente integrada con MarineTraffic para calcular rutas óptimas según la posición de los barcos.</small>`)}
-   ${card('04',`<b>Logística de materiales e insumos</b><small>Consolidar los pedidos de materiales, insumos y consumibles para aprovechar cada viaje y extender la autonomía de los barcos entre entregas.</small>`)}
-  </div>
- </section>
- <section class="sl">${num(12)}
-  <p class="kick">Próximos pasos</p>
-  <div class="col cons5">
-   ${row('01','<b>Definir la forma de contratación</b>','Time Charter o licitación por paquete de necesidades con spot')}
-   ${row('02','<b>Preparar la solicitud de cotización</b>','Entregar la línea base (horarios, personas, horas y capacidades) a Arpón y BSS')}
-   ${row('03','<b>Evaluar las ofertas</b>','Comparar contra el costo actual: punto de equilibrio de '+money(BASE_COST/365)+' por día')}
-   ${row('04','<b>Preparar la implementación</b>','Designar al coordinador, definir la herramienta de reservas y medir la cobertura mensualmente')}
-  </div>
- </section>
  </div>`;
 }
 VIEWS.unshift({id:'presentacion',name:'Presentación',r:renderPres});
