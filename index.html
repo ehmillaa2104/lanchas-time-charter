@@ -255,6 +255,7 @@ html.pmode .pexit:hover{opacity:1}
 .s4 .chs .col{padding:2.2vh 2vw;gap:1vh}
 .s4 .chs h3{font-size:clamp(18px,1.5vw,28px)}
 .s4 .kp3 .cx{padding:2.4vh 2vw}
+.pill.pl2{text-transform:none;letter-spacing:.01em;font-size:1em;margin-left:.6em;vertical-align:.05em}
 .pill{display:inline-block;margin-left:.5em;padding:.15em .7em;border-radius:999px;font-weight:800;font-size:.9em;color:#3a2203;background:#EF9F27;letter-spacing:.01em}
 .efi{border-radius:18px;padding:2vh 1.4vw;background:rgba(192,221,151,.08);border:1.5px solid rgba(192,221,151,.45);display:flex;flex-direction:column;gap:1.2vh}
 .efi .et{font-size:clamp(14px,1.1vw,20px);font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#C0DD97}
@@ -1570,7 +1571,7 @@ function renderPres(){
  <section class="sl s4">${num(3)}
   <p class="kick">Situación actual · agosto 2025 a julio 2026</p>
   <div class="g3 kp3">
-   <div class="cx"><span class="lbk">Costo anual</span><span class="nn">${mil(tC)}</span><small style="white-space:nowrap">MOTI y Trader Tanker <span class="pill">Sin Comanche</span></small></div>
+   <div class="cx"><span class="lbk">Costo anual <span class="pill pl2">Sin Comanche</span></span><span class="nn">${mil(tC)}</span><small style="white-space:nowrap">MOTI ${p0(agg('MOTI',null,'costo_anio')/tC*100)} · Trader Tanker ${p0(agg('TT',null,'costo_anio')/tC*100)}</small></div>
    <div class="cx"><span class="lbk">Horas de lancha al año</span><span class="nn">${nfp(tH)}<span class="unit"> ${nfp(tH/52)} h/sem</span></span><small>MOTI ${p0(agg('MOTI',null,'horas_anio')/tH*100)} · Trader Tanker ${p0(agg('TT',null,'horas_anio')/tH*100)}</small></div>
    <div class="cx"><span class="lbk">Costo promedio por hora</span><span class="nn">$${Math.round(tC/tH)}<span class="unit">/h</span></span><small>MOTI $${Math.round(agg('MOTI',null,'costo_anio')/agg('MOTI',null,'horas_anio'))}/h · Trader Tanker $${Math.round(agg('TT',null,'costo_anio')/agg('TT',null,'horas_anio'))}/h</small></div>
   </div>
