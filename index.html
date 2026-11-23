@@ -1636,9 +1636,9 @@ function renderPres(){
  ${(()=>{const h1=hrs('a',DS,0,24)*52,h2=hrs('b',DS,0,24)*52,hs=tH*0.10,hT=h1+h2+hs;
   // Consumo informado por Arpón (19 nov 2026), dos motores: Perseverance 2 x 480 HP, 48 a 52 gal/h (se usa 50);
   // Arpón 1 e Infinity 2 x 385 HP, 40.2 gal/h. Cada lancha hace un tercio de las horas del modelo y el spot (Esteban, 19 nov 2026).
-  const GP=50,GA=40.2,KGG=3.785411784*0.84,PT=1000,MES=22500,NL=3;
-  const gal=hT/3*(GP+GA+GA),ft=gal*KGG/1000;
-  const fc=ft*PT,ch=MES*NL*12,tot=ch+fc,ah=BASE_COST-tot,neg=ah<0;
+  // Combustible a $6 por galón y al 70% del consumo máximo informado (Esteban, 23 nov 2026).
+  const GP=50,GA=40.2,FC=0.70,PG=6,MES=22500,NL=3,hL=hT/3;
+  const gal=hL*(GP+GA+GA)*FC,fc=gal*PG,ch=MES*NL*12,tot=ch+fc,ah=BASE_COST-tot,neg=ah<0;
   return `<section class="sl ar7s">${num(7)}
   <p class="kick">Propuesta de Arpón: Time Charter</p>
   <div class="ar7">
@@ -1654,24 +1654,24 @@ function renderPres(){
      <li><b>Reemplazo de la nave</b> si falla o entra a mantenimiento</li>
     </ul>
     <span class="cvt arh">Horas y combustible: ${nfp(hT)} h ÷ 3 lanchas</span>
-    <table class="art arf"><thead><tr><th>Embarcación</th><th class="n">Motores</th><th class="n">Horas al año</th><th class="n">gal/h</th><th class="n">Galones</th><th class="n">Toneladas</th></tr></thead><tbody>
-     <tr><td>Perseverance</td><td class="n">2 × 480 HP</td><td class="n">${nfp(hT/3)}</td><td class="n">50</td><td class="n">${nfp(hT/3*GP)}</td><td class="n">${nfp(hT/3*GP*KGG/1000)} t</td></tr>
-     <tr><td>Arpón 1</td><td class="n">2 × 385 HP</td><td class="n">${nfp(hT/3)}</td><td class="n">40.2</td><td class="n">${nfp(hT/3*GA)}</td><td class="n">${nfp(hT/3*GA*KGG/1000)} t</td></tr>
-     <tr><td>Infinity</td><td class="n">2 × 385 HP</td><td class="n">${nfp(hT/3)}</td><td class="n">40.2</td><td class="n">${nfp(hT/3*GA)}</td><td class="n">${nfp(hT/3*GA*KGG/1000)} t</td></tr>
-     <tr class="artot"><td>Total</td><td class="n"></td><td class="n">${nfp(hT)}</td><td class="n"></td><td class="n">${nfp(gal)}</td><td class="n">${nfp(ft)} t</td></tr>
+    <table class="art arf"><thead><tr><th>Embarcación</th><th class="n">Motores</th><th class="n">Horas al año</th><th class="n">gal/h máx.</th><th class="n">gal/h al 70%</th><th class="n">Galones</th><th class="n">Diésel a $6/gal</th></tr></thead><tbody>
+     <tr><td>Perseverance</td><td class="n">2 × 480 HP</td><td class="n">${nfp(hL)}</td><td class="n">50</td><td class="n">${(GP*FC).toFixed(1)}</td><td class="n">${nfp(hL*GP*FC)}</td><td class="n">${kf(hL*GP*FC*PG)}</td></tr>
+     <tr><td>Arpón 1</td><td class="n">2 × 385 HP</td><td class="n">${nfp(hL)}</td><td class="n">40.2</td><td class="n">${(GA*FC).toFixed(1)}</td><td class="n">${nfp(hL*GA*FC)}</td><td class="n">${kf(hL*GA*FC*PG)}</td></tr>
+     <tr><td>Infinity</td><td class="n">2 × 385 HP</td><td class="n">${nfp(hL)}</td><td class="n">40.2</td><td class="n">${(GA*FC).toFixed(1)}</td><td class="n">${nfp(hL*GA*FC)}</td><td class="n">${kf(hL*GA*FC*PG)}</td></tr>
+     <tr class="artot"><td>Total</td><td class="n"></td><td class="n">${nfp(hT)}</td><td class="n"></td><td class="n"></td><td class="n">${nfp(gal)}</td><td class="n">${kf(fc)}</td></tr>
     </tbody></table>
    </div>
    <div class="col arr">
     <span class="cvt">Costo anual estimado</span>
     <div class="lg5">
      <div class="lr"><i></i><span>Fletamento<small>$22,500 × ${NL} lanchas × 12 meses</small></span><b>${kf(ch)}</b></div>
-     <div class="lr"><i>+</i><span>Combustible<small>${nfp(ft)} t × $1,000/t (${nfp(gal)} gal)</small></span><b>${kf(fc)}</b></div>
+     <div class="lr"><i>+</i><span>Diésel<small>${nfp(gal)} gal × $6 el galón, consumo al 70%</small></span><b>${kf(fc)}</b></div>
      <div class="lr lt2"><i>=</i><span>Costo anual con Arpón</span><b>${kf(tot)}</b></div>
      <div class="lr"><i></i><span>Costo actual<small>al año, sin Comanche</small></span><b>${kf(BASE_COST)}</b></div>
      <div class="lr lsv${neg?' lng':''}"><i>=</i><span>${neg?'Costo adicional':'Ahorro estimado'}<small>${p0(Math.abs(ah)/BASE_COST*100)} ${neg?'más':'menos'} que hoy</small></span><b>${neg?'+':''}${kf(Math.abs(ah))}</b></div>
     </div>
     <div class="pdx"><div class="pdb pdr${tot/365>eq?' png':''}"><small>Arpón / día</small><b>${money(tot/365)}</b><span>con combustible</span></div><div class="pdb"><small>Equilibrio / día</small><b>${money(eq)}</b><span>costo actual ÷ 365</span></div></div>
-    <p class="pen">Consumo informado por Arpón (Perseverance: 48 a 52 gal/h, se usa 50). Es un techo: con motores apagados en espera, baja. 1 t = 314 gal.</p>
+    <p class="pen">Consumo máximo informado por Arpón (Perseverance: 48 a 52 gal/h, se usa 50), calculado al 70% porque las lanchas no navegan todo el tiempo a plena potencia. Diésel a $6 por galón.</p>
    </div>
   </div>
  </section>`;})()}
@@ -1679,34 +1679,34 @@ function renderPres(){
   // Estimación (Esteban, 20 nov 2026): una lancha de 44 pasajeros y una de carga, sin nombre, a $750 por día cada una.
   // Horas del modelo y el spot repartidas según el uso de cada lancha en el modelo. Consumo de referencia: lancha de 44 como Perseverance
   // (50 gal/h) y lancha de carga como Arpón 1 (40.2 gal/h), con los datos que informó Arpón.
-  const G1=50,G2=40.2,KGG=3.785411784*0.84,PT=1000,DIA=750,NL=2;
-  const gal=H1*G1+H2*G2,ft=gal*KGG/1000,fc=ft*PT,ch=DIA*NL*365,tot=ch+fc,ah=BASE_COST-tot,neg=ah<0;
+  const G1=50,G2=40.2,FC=0.70,PG=6,DIA=750,NL=2;   // $6 por galón, al 70% del consumo máximo (Esteban, 23 nov 2026)
+  const gal=(H1*G1+H2*G2)*FC,fc=gal*PG,ch=DIA*NL*365,tot=ch+fc,ah=BASE_COST-tot,neg=ah<0;
   return `<section class="sl ar7s">${num(8)}
   <p class="kick">Estimación: 2 lanchas en Time Charter</p>
   <div class="ar7">
    <div class="col arl">
     <span class="cvt">Lanchas del modelo a $750 por día</span>
-    <table class="art"><thead><tr><th>Lancha</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Horas al año</th><th class="n">gal/h</th><th class="n">Día</th></tr></thead><tbody>
-     <tr><td>Lancha de 44</td><td class="n">44</td><td class="n"></td><td class="n">${nfp(H1)} h <small class="inl">${p0(s1*100)}</small></td><td class="n">50</td><td class="n">$750</td></tr>
-     <tr><td>Lancha de carga</td><td class="n">20</td><td class="n">6 t</td><td class="n">${nfp(H2)} h <small class="inl">${p0((1-s1)*100)}</small></td><td class="n">40.2</td><td class="n">$750</td></tr>
+    <table class="art"><thead><tr><th>Lancha</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Horas al año</th><th class="n">gal/h al 70%</th><th class="n">Día</th></tr></thead><tbody>
+     <tr><td>Lancha de 44</td><td class="n">44</td><td class="n"></td><td class="n">${nfp(H1)} h <small class="inl">${p0(s1*100)}</small></td><td class="n">${(G1*FC).toFixed(1)} <small class="inl">de 50</small></td><td class="n">$750</td></tr>
+     <tr><td>Lancha de carga</td><td class="n">20</td><td class="n">6 t</td><td class="n">${nfp(H2)} h <small class="inl">${p0((1-s1)*100)}</small></td><td class="n">${(G2*FC).toFixed(1)} <small class="inl">de 40.2</small></td><td class="n">$750</td></tr>
     </tbody></table>
     <ul class="arc">
      <li><b>Mismo precio que la propuesta de Arpón:</b> $750 por día por lancha, sin combustible</li>
      <li><b>Mismas horas:</b> las ${nfp(hT)} h del modelo y el spot, repartidas según el uso de cada lancha en el modelo</li>
-     <li><b>Consumo de referencia:</b> la de 44 como Perseverance y la de carga como Arpón 1</li>
+     <li><b>Diésel:</b> $6 por galón; consumo como Perseverance (la de 44) y Arpón 1 (la de carga), al 70% del máximo</li>
     </ul>
    </div>
    <div class="col arr">
     <span class="cvt">Costo anual estimado</span>
     <div class="lg5">
      <div class="lr"><i></i><span>Fletamento<small>$750 × ${NL} lanchas × 365 días</small></span><b>${kf(ch)}</b></div>
-     <div class="lr"><i>+</i><span>Combustible<small>${nfp(ft)} t × $1,000/t (${nfp(gal)} gal)</small></span><b>${kf(fc)}</b></div>
+     <div class="lr"><i>+</i><span>Diésel<small>${nfp(gal)} gal × $6 el galón, consumo al 70%</small></span><b>${kf(fc)}</b></div>
      <div class="lr lt2"><i>=</i><span>Costo anual estimado</span><b>${kf(tot)}</b></div>
      <div class="lr"><i></i><span>Costo actual<small>al año, sin Comanche</small></span><b>${kf(BASE_COST)}</b></div>
      <div class="lr lsv${neg?' lng':''}"><i>=</i><span>${neg?'Costo adicional':'Ahorro estimado'}<small>${p0(Math.abs(ah)/BASE_COST*100)} ${neg?'más':'menos'} que hoy</small></span><b>${neg?'+':''}${kf(Math.abs(ah))}</b></div>
     </div>
     <div class="pdx"><div class="pdb pdr${tot/365>eq?' png':''}"><small>Estimación / día</small><b>${money(tot/365)}</b><span>con combustible</span></div><div class="pdb"><small>Equilibrio / día</small><b>${money(eq)}</b><span>costo actual ÷ 365</span></div></div>
-    <p class="pen">Consumo aplicado a todas las horas. Es un techo: con motores apagados en espera, baja.</p>
+    <p class="pen">Consumo calculado al 70% del máximo porque las lanchas no navegan todo el tiempo a plena potencia. Diésel a $6 por galón.</p>
    </div>
   </div>
  </section>`;})()}
