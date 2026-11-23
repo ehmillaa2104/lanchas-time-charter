@@ -727,10 +727,27 @@ html.pmode .pexit:hover{opacity:1}
 .cmt td:first-child small{display:block;font-weight:500;color:rgba(241,239,232,.55);font-size:.72em}
 .cmt tr.ctot td{font-size:1.3em;font-weight:900;color:#fff;border-top:1px solid rgba(255,255,255,.28)}
 .cmt tr.cdif td b{font-size:1.25em;font-weight:900}
+.cmx{display:flex;align-items:stretch;gap:1.2vw}
+.cmx.open .cmt{font-size:clamp(12px,1.04vw,20px)}
+.cmx.open .cmt th{font-size:clamp(13px,1.12vw,22px)}
+.cmx.open .cmt td,.cmx.open .cmt th{padding-left:.5vw;padding-right:.5vw}
+.cmx .cmt{flex:1}
+.cmx:not(.open) .cxe{display:none}
+.cmt .cxe{background:rgba(93,202,165,.06)}
+.cmt th.cxe{background:rgba(93,202,165,.12)}
+.cmt thead th.cxe:nth-last-child(2){border-radius:14px 0 0 0}
+.cmt thead th.cxe:last-child{border-radius:0 14px 0 0}
+.cmtg{writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;gap:1.2vh;width:clamp(34px,2.8vw,54px);border-radius:14px;border:1px solid rgba(93,202,165,.45);background:rgba(93,202,165,.1);color:var(--ac1);font:800 clamp(12px,.95vw,18px)/1 Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:2vh 0;transition:background .2s}
+.cmtg:hover{background:rgba(93,202,165,.2)}
+.cmtg b{font-size:1.6em;transition:transform .25s}
+.cmx.open .cmtg b{transform:rotate(180deg)}
+.cmtg .o2,.cmx.open .cmtg .o1{display:none}
+.cmx.open .cmtg .o2{display:inline}
 .cmt .c247{display:inline-block;font-size:.62em;font-weight:800;color:#0E1A16;background:var(--ac1);border-radius:999px;padding:.15em .55em;margin-left:.3em;vertical-align:.2em}
 .cmt .cup{color:#F0716A}
 .cmt .cdn{color:#6FD69B}
 .cmt tr.cdif td small{display:block;font-size:.72em;color:rgba(241,239,232,.6)}
+@media (max-width:1500px){.req .rw{font-size:2.25vw}.req .col{gap:3.6vh}.prf.rec.tc .cx{padding:3.6vh 2.2vw 1.6vh;font-size:2.1vw}}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
 .big .lbuso .br{grid-template-columns:minmax(220px,1fr) 4fr 200px;font-size:17px}
@@ -1081,6 +1098,7 @@ const BASE=[
  {k:'ron',n:'Técnicos y contratistas (MOTI + TT)',h:46.3,c:481231,r:200}
 ];
 const BASE_COST=1330194,BASE_H=136.6,COMANCHE=185159;
+let CMP_OPEN=false;   // comparativo: columnas estimadas visibles
 const COORD=30000;   // coordinador logístico, costo anual (Esteban, 23 nov 2026)
 const money=n=>'$'+Math.round(n).toLocaleString('en-US');
 function cats(m){const o={rm:0,rtt:0,mat:0,ron:0};
@@ -1623,16 +1641,17 @@ function renderPres(){
    const cl=t=>t>BASE_COST?'cup':'cdn';
    const tot=t=>`<b class="${cl(t)}">${kf(t)}</b>`;
    const dif=t=>{const d=t-BASE_COST;return d>0?`<b class="cup">+${kf(d)}</b><small>${p0(d/BASE_COST*100)} más</small>`:`<b class="cdn">−${kf(-d)}</b><small>${p0(-d/BASE_COST*100)} menos</small>`;};
-   return `<table class="cmt"><thead><tr><th></th><th>Hoy</th><th>Time Charter Arpón <span class="c247">24/7</span><small>3 lanchas, propuesta</small></th><th>Time Charter <span class="c247">24/7</span><small>2 lanchas, estimado</small></th><th>Paquete por horas<small>tarifa actual</small></th><th>Paquete por horas<small>negociado</small></th></tr></thead><tbody>
-    <tr><td>Cómo se contrata</td><td>Por hora, a pedido</td><td>$22,500/mes por lancha</td><td>$22,500/mes por lancha</td><td>${money(avg)}/h, flota del proveedor</td><td>${money(NEG)}/h, flota del proveedor</td></tr>
-    <tr><td>Horas al año</td><td>${nfp(tH)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td></tr>
-    <tr><td>Fletamento u horas</td><td>${kf(BASE_COST)}</td><td>${kf(A.ch)}</td><td>${kf(B.ch)}</td><td>${kf(C.ch)}</td><td>${kf(D.ch)}</td></tr>
-    <tr><td>Diésel<small>$6 el galón, consumo al 70%</small></td><td>Incluido</td><td>${kf(A.fc)}</td><td>${kf(B.fc)}</td><td>Incluido</td><td>Incluido</td></tr>
-    <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td>${kf(COORD)}</td></tr>
-    <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td>${tot(A.t)}</td><td>${tot(B.t)}</td><td>${tot(C.t)}</td><td>${tot(D.t)}</td></tr>
-    <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(A.t)}</td><td>${dif(B.t)}</td><td>${dif(C.t)}</td><td>${dif(D.t)}</td></tr>
-    <tr><td>Costo por día</td><td>${money(BASE_COST/365)}</td><td>${money(A.t/365)}</td><td>${money(B.t/365)}</td><td>${money(C.t/365)}</td><td>${money(D.t/365)}</td></tr>
-   </tbody></table>`;})()}
+   return `<div class="cmx${CMP_OPEN?' open':''}"><table class="cmt"><thead><tr><th></th><th>Hoy</th><th>Time Charter Arpón <span class="c247">24/7</span><small>3 lanchas, propuesta</small></th><th>Paquete por horas<small>tarifa actual</small></th><th class="cxe">Time Charter <span class="c247">24/7</span><small>2 lanchas, estimado</small></th><th class="cxe">Paquete por horas<small>negociado</small></th></tr></thead><tbody>
+    <tr><td>Cómo se contrata</td><td>Por hora, a pedido</td><td>$22,500/mes por lancha</td><td>${money(avg)}/h, flota del proveedor</td><td class="cxe">$22,500/mes por lancha</td><td class="cxe">${money(NEG)}/h, flota del proveedor</td></tr>
+    <tr><td>Horas al año</td><td>${nfp(tH)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td class="cxe">${nfp(hT)}</td><td class="cxe">${nfp(hT)}</td></tr>
+    <tr><td>Fletamento u horas</td><td>${kf(BASE_COST)}</td><td>${kf(A.ch)}</td><td>${kf(C.ch)}</td><td class="cxe">${kf(B.ch)}</td><td class="cxe">${kf(D.ch)}</td></tr>
+    <tr><td>Diésel<small>$6 el galón, consumo al 70%</small></td><td>Incluido</td><td>${kf(A.fc)}</td><td>Incluido</td><td class="cxe">${kf(B.fc)}</td><td class="cxe">Incluido</td></tr>
+    <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td class="cxe">${kf(COORD)}</td><td class="cxe">${kf(COORD)}</td></tr>
+    <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td>${tot(A.t)}</td><td>${tot(C.t)}</td><td class="cxe">${tot(B.t)}</td><td class="cxe">${tot(D.t)}</td></tr>
+    <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(A.t)}</td><td>${dif(C.t)}</td><td class="cxe">${dif(B.t)}</td><td class="cxe">${dif(D.t)}</td></tr>
+    <tr><td>Costo por día</td><td>${money(BASE_COST/365)}</td><td>${money(A.t/365)}</td><td>${money(C.t/365)}</td><td class="cxe">${money(B.t/365)}</td><td class="cxe">${money(D.t/365)}</td></tr>
+   </tbody></table>
+   <button class="cmtg" data-cmptg="1" title="Mostrar u ocultar las alternativas estimadas"><span class="o1">Ver estimados</span><span class="o2">Ocultar estimados</span><b>›</b></button></div>`;})()}
   </div>
  </section>
  <section class="sl">${num(6)}
@@ -1840,6 +1859,7 @@ let cur=null;
   if(!dbSaving&&!dbRO)setStatus('ok');
  },err=>{clearTimeout(t);setStatus(err&&err.code==='revoked'?'ro':'err');});
 })();
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-cmptg]');if(!b)return;CMP_OPEN=!CMP_OPEN;b.closest('.cmx').classList.toggle('open',CMP_OPEN);b.blur();});
 view.addEventListener('click',ev=>{const g=ev.target.closest('tr.grp');if(!g)return;g.classList.toggle('open');view.querySelectorAll('tr.g'+g.dataset.g).forEach(r=>r.classList.toggle('show'));});
 view.addEventListener('click',ev=>{const b=ev.target.closest('.rst');if(!b)return;MODELS[+b.dataset.m].plan=JSON.parse(ORIG)[+b.dataset.m];save();show(current);});
 view.addEventListener('pointerdown',ev=>{
