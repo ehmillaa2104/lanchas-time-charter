@@ -718,14 +718,15 @@ html.pmode .pexit:hover{opacity:1}
 .eq.eq3{grid-template-columns:1.3fr auto .8fr auto 1.4fr;gap:1.4vw}
 .pdx{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
 .cmw{flex:1;display:flex;flex-direction:column;justify-content:center}
-.cmt{width:100%;border-collapse:separate;border-spacing:0;font-size:clamp(13px,1.12vw,21px)}
-.cmt th{font-size:clamp(14px,1.2vw,23px);font-weight:800;color:#fff;text-align:center;padding:1.2vh .8vw;vertical-align:bottom;line-height:1.15}
+.cmt{width:100%;border-collapse:separate;border-spacing:0;font-size:clamp(13px,1.15vw,22px)}
+.cmt th{font-size:clamp(14px,1.24vw,24px);white-space:nowrap;font-weight:800;color:#fff;text-align:center;padding:1.2vh .8vw;vertical-align:bottom;line-height:1.15}
 .cmt th small{display:block;font-size:.62em;font-weight:600;color:rgba(241,239,232,.6);margin-top:.3vh}
-.cmt td{padding:.95vh .8vw;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);color:rgba(241,239,232,.88);font-variant-numeric:tabular-nums;line-height:1.25}
+.cmt td{padding:1.45vh .7vw;white-space:nowrap;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);color:rgba(241,239,232,.88);font-variant-numeric:tabular-nums;line-height:1.25}
 .cmt td:first-child{text-align:left;font-weight:700;color:#F1EFE8;white-space:nowrap}
 .cmt td:first-child small{display:block;font-weight:500;color:rgba(241,239,232,.55);font-size:.72em}
 .cmt tr.ctot td{font-size:1.3em;font-weight:900;color:#fff;border-top:1px solid rgba(255,255,255,.28)}
 .cmt tr.cdif td b{font-size:1.25em;font-weight:900}
+.cmt .c247{display:inline-block;font-size:.62em;font-weight:800;color:#0E1A16;background:var(--ac1);border-radius:999px;padding:.15em .55em;margin-left:.3em;vertical-align:.2em}
 .cmt .cup{color:#F0716A}
 .cmt .cdn{color:#6FD69B}
 .cmt tr.cdif td small{display:block;font-size:.72em;color:rgba(241,239,232,.6)}
@@ -1620,17 +1621,15 @@ function renderPres(){
    const cl=t=>t>BASE_COST?'cup':'cdn';
    const tot=t=>`<b class="${cl(t)}">${kf(t)}</b>`;
    const dif=t=>{const d=t-BASE_COST;return d>0?`<b class="cup">+${kf(d)}</b><small>${p0(d/BASE_COST*100)} más</small>`:`<b class="cdn">−${kf(-d)}</b><small>${p0(-d/BASE_COST*100)} menos</small>`;};
-   return `<table class="cmt"><thead><tr><th></th><th>Hoy</th><th>Time Charter Arpón<small>3 lanchas, propuesta</small></th><th>Time Charter<small>2 lanchas, estimado</small></th><th>Paquete por horas<small>tarifa actual</small></th><th>Paquete por horas<small>negociado</small></th></tr></thead><tbody>
+   return `<table class="cmt"><thead><tr><th></th><th>Hoy</th><th>Time Charter Arpón <span class="c247">24/7</span><small>3 lanchas, propuesta</small></th><th>Time Charter <span class="c247">24/7</span><small>2 lanchas, estimado</small></th><th>Paquete por horas<small>tarifa actual</small></th><th>Paquete por horas<small>negociado</small></th></tr></thead><tbody>
     <tr><td>Cómo se contrata</td><td>Por hora, a pedido</td><td>$22,500/mes por lancha</td><td>$22,500/mes por lancha</td><td>${money(avg)}/h, flota del proveedor</td><td>${money(NEG)}/h, flota del proveedor</td></tr>
     <tr><td>Horas al año</td><td>${nfp(tH)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td></tr>
-    <tr><td>Lanchas u horas</td><td>${kf(BASE_COST)}</td><td>${kf(A.ch)}</td><td>${kf(B.ch)}</td><td>${kf(C.ch)}</td><td>${kf(D.ch)}</td></tr>
+    <tr><td>Fletamento u horas</td><td>${kf(BASE_COST)}</td><td>${kf(A.ch)}</td><td>${kf(B.ch)}</td><td>${kf(C.ch)}</td><td>${kf(D.ch)}</td></tr>
     <tr><td>Diésel<small>$6 el galón, consumo al 70%</small></td><td>Incluido</td><td>${kf(A.fc)}</td><td>${kf(B.fc)}</td><td>Incluido</td><td>Incluido</td></tr>
     <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td>${kf(COORD)}</td></tr>
     <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td>${tot(A.t)}</td><td>${tot(B.t)}</td><td>${tot(C.t)}</td><td>${tot(D.t)}</td></tr>
     <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(A.t)}</td><td>${dif(B.t)}</td><td>${dif(C.t)}</td><td>${dif(D.t)}</td></tr>
     <tr><td>Costo por día</td><td>${money(BASE_COST/365)}</td><td>${money(A.t/365)}</td><td>${money(B.t/365)}</td><td>${money(C.t/365)}</td><td>${money(D.t/365)}</td></tr>
-    <tr><td>Riesgo del diésel</td><td>Proveedor</td><td>MOTI y TT</td><td>MOTI y TT</td><td>Proveedor</td><td>Proveedor</td></tr>
-    <tr><td>Disponibilidad</td><td>A pedido</td><td>3 lanchas 24/7</td><td>2 lanchas 24/7</td><td>Horario programado y spot</td><td>Horario programado y spot</td></tr>
    </tbody></table>`;})()}
   </div>
  </section>
