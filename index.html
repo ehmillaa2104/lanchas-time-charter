@@ -724,16 +724,11 @@ html.pmode .pexit:hover{opacity:1}
 .cmt td{padding:.95vh .8vw;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);color:rgba(241,239,232,.88);font-variant-numeric:tabular-nums;line-height:1.25}
 .cmt td:first-child{text-align:left;font-weight:700;color:#F1EFE8;white-space:nowrap}
 .cmt td:first-child small{display:block;font-weight:500;color:rgba(241,239,232,.55);font-size:.72em}
-.cmt .best{background:rgba(93,202,165,.09);border-left:1px solid rgba(93,202,165,.5);border-right:1px solid rgba(93,202,165,.5)}
-.cmt th.best{background:rgba(93,202,165,.18);border-top:1px solid rgba(93,202,165,.5);border-radius:14px 14px 0 0}
-.cmt tbody tr:last-child td.best{border-bottom:1px solid rgba(93,202,165,.5);border-radius:0 0 14px 14px}
 .cmt tr.ctot td{font-size:1.3em;font-weight:900;color:#fff;border-top:1px solid rgba(255,255,255,.28)}
 .cmt tr.cdif td b{font-size:1.25em;font-weight:900}
-.cmt .cup{color:#EF9F27}
-.cmt .cdn{color:#C0DD97}
+.cmt .cup{color:#F0716A}
+.cmt .cdn{color:#6FD69B}
 .cmt tr.cdif td small{display:block;font-size:.72em;color:rgba(241,239,232,.6)}
-.crec{margin-top:2.2vh;padding:1.5vh 1.6vw;border-radius:14px;background:rgba(93,202,165,.08);border:1px solid rgba(93,202,165,.4);font-size:clamp(14px,1.25vw,24px);color:#F1EFE8;line-height:1.35}
-.crec b{color:var(--ac1)}
 .wrap.big{max-width:1600px}
 .big .ch3{font-size:21px}
 .big .lbuso .br{grid-template-columns:minmax(220px,1fr) 4fr 200px;font-size:17px}
@@ -1617,25 +1612,26 @@ function renderPres(){
   <p class="kick">Comparativo de alternativas</p>
   <div class="cmw">
   ${(()=>{const pl=MODELS[0].plan,sh=k=>pl.reduce((t,d)=>t+d[k].filter(e=>!e[6]).reduce((u,e)=>u+e[1]-e[0],0),0)*52;
-   const h1=sh('a'),h2=sh('b'),hs=tH*0.10,hT=h1+h2+hs,s1=h1/(h1+h2),avg=BASE_COST/tH,FC=0.7,PG=6,MES=22500;
+   const h1=sh('a'),h2=sh('b'),hs=tH*0.10,hT=h1+h2+hs,s1=h1/(h1+h2),avg=BASE_COST/tH,NEG=175,FC=0.7,PG=6,MES=22500;
    const A={ch:MES*3*12,fc:hT/3*(50+40.2+40.2)*FC*PG};A.t=A.ch+A.fc+COORD;   // propuesta de Arpón (diapositiva 8)
    const B={ch:MES*2*12,fc:(hT*s1*50+hT*(1-s1)*40.2)*FC*PG};B.t=B.ch+B.fc+COORD;   // estimado 2 lanchas (diapositiva 9)
    const C={ch:hT*avg};C.t=C.ch+COORD;   // paquete por horas a la tarifa actual (diapositiva 10)
+   const D={ch:hT*NEG};D.t=D.ch+COORD;   // paquete por horas negociado a $175/h
+   const cl=t=>t>BASE_COST?'cup':'cdn';
+   const tot=t=>`<b class="${cl(t)}">${kf(t)}</b>`;
    const dif=t=>{const d=t-BASE_COST;return d>0?`<b class="cup">+${kf(d)}</b><small>${p0(d/BASE_COST*100)} más</small>`:`<b class="cdn">−${kf(-d)}</b><small>${p0(-d/BASE_COST*100)} menos</small>`;};
-   const lim=(BASE_COST-COORD)/365/2;
-   return `<table class="cmt"><thead><tr><th></th><th>Hoy</th><th>Time Charter Arpón<small>3 lanchas, propuesta</small></th><th>Time Charter<small>2 lanchas, estimado</small></th><th class="best">Paquete por horas<small>licitación</small></th></tr></thead><tbody>
-    <tr><td>Cómo se contrata</td><td>Por hora, a pedido</td><td>$22,500 al mes por lancha</td><td>$22,500 al mes por lancha</td><td class="best">${money(avg)}/h, el proveedor pone la flota</td></tr>
-    <tr><td>Horas al año</td><td>${nfp(tH)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td class="best">${nfp(hT)}</td></tr>
-    <tr><td>Lanchas u horas</td><td>${kf(BASE_COST)}</td><td>${kf(A.ch)}</td><td>${kf(B.ch)}</td><td class="best">${kf(C.ch)}</td></tr>
-    <tr><td>Diésel<small>$6 el galón, consumo al 70%</small></td><td>Incluido</td><td>${kf(A.fc)}</td><td>${kf(B.fc)}</td><td class="best">Incluido</td></tr>
-    <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td class="best">${kf(COORD)}</td></tr>
-    <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td>${kf(A.t)}</td><td>${kf(B.t)}</td><td class="best">${kf(C.t)}</td></tr>
-    <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(A.t)}</td><td>${dif(B.t)}</td><td class="best">${dif(C.t)}</td></tr>
-    <tr><td>Costo por día</td><td>${money(BASE_COST/365)}</td><td>${money(A.t/365)}</td><td>${money(B.t/365)}</td><td class="best">${money(C.t/365)}</td></tr>
-    <tr><td>Riesgo del consumo de diésel</td><td>Proveedor</td><td>MOTI y TT</td><td>MOTI y TT</td><td class="best">Proveedor</td></tr>
-    <tr><td>Disponibilidad</td><td>A pedido</td><td>3 lanchas 24/7</td><td>2 lanchas 24/7</td><td class="best">Horario programado y spot</td></tr>
-   </tbody></table>
-   <div class="crec"><b>Recomendación:</b> licitar el paquete por horas. El Time Charter solo conviene si el proveedor incluye el diésel y cobra menos de ${money(lim)} por lancha al día.</div>`;})()}
+   return `<table class="cmt"><thead><tr><th></th><th>Hoy</th><th>Time Charter Arpón<small>3 lanchas, propuesta</small></th><th>Time Charter<small>2 lanchas, estimado</small></th><th>Paquete por horas<small>tarifa actual</small></th><th>Paquete por horas<small>negociado</small></th></tr></thead><tbody>
+    <tr><td>Cómo se contrata</td><td>Por hora, a pedido</td><td>$22,500/mes por lancha</td><td>$22,500/mes por lancha</td><td>${money(avg)}/h, flota del proveedor</td><td>${money(NEG)}/h, flota del proveedor</td></tr>
+    <tr><td>Horas al año</td><td>${nfp(tH)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td><td>${nfp(hT)}</td></tr>
+    <tr><td>Lanchas u horas</td><td>${kf(BASE_COST)}</td><td>${kf(A.ch)}</td><td>${kf(B.ch)}</td><td>${kf(C.ch)}</td><td>${kf(D.ch)}</td></tr>
+    <tr><td>Diésel<small>$6 el galón, consumo al 70%</small></td><td>Incluido</td><td>${kf(A.fc)}</td><td>${kf(B.fc)}</td><td>Incluido</td><td>Incluido</td></tr>
+    <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td>${kf(COORD)}</td></tr>
+    <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td>${tot(A.t)}</td><td>${tot(B.t)}</td><td>${tot(C.t)}</td><td>${tot(D.t)}</td></tr>
+    <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(A.t)}</td><td>${dif(B.t)}</td><td>${dif(C.t)}</td><td>${dif(D.t)}</td></tr>
+    <tr><td>Costo por día</td><td>${money(BASE_COST/365)}</td><td>${money(A.t/365)}</td><td>${money(B.t/365)}</td><td>${money(C.t/365)}</td><td>${money(D.t/365)}</td></tr>
+    <tr><td>Riesgo del diésel</td><td>Proveedor</td><td>MOTI y TT</td><td>MOTI y TT</td><td>Proveedor</td><td>Proveedor</td></tr>
+    <tr><td>Disponibilidad</td><td>A pedido</td><td>3 lanchas 24/7</td><td>2 lanchas 24/7</td><td>Horario programado y spot</td><td>Horario programado y spot</td></tr>
+   </tbody></table>`;})()}
   </div>
  </section>
  ${(()=>{const pl=MODELS[0].plan,DS=[0,1,2,3,4,5,6],WE=[5,6];
