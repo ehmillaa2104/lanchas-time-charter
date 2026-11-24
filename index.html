@@ -772,30 +772,6 @@ html.pmode .pexit:hover{opacity:1}
 .cmt .c247{display:inline-block;font-size:.62em;font-weight:800;color:#0E1A16;background:var(--ac1);border-radius:999px;padding:.15em .55em;margin-left:.3em;vertical-align:.2em}
 .cmt .cup{color:#F0716A}
 .cmt .cdn{color:#6FD69B}
-/* Costo anual por alternativa, barras (Yelko, 23 nov 2026) */
-.sl.cax h2{margin:0;font-size:clamp(26px,2.7vw,50px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
-.sl.cax{gap:3vh}
-.cax h2 em{font-style:normal;background:linear-gradient(135deg,var(--ac1),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.caxc{display:flex;flex-direction:column;gap:2.2vh;flex:1;justify-content:center}
-.caxr{display:grid;grid-template-columns:minmax(200px,26%) 1fr;align-items:center;gap:1.6vw}
-.caxl{font-size:clamp(15px,1.25vw,23px);font-weight:700;line-height:1.2}
-.caxl small{display:block;font-size:.72em;font-weight:500;color:rgba(241,239,232,.65);margin-top:.3vh}
-.caxl small b{color:#F1EFE8}
-.caxt{position:relative;height:clamp(34px,5vh,56px)}
-.caxb{position:absolute;left:0;top:0;bottom:0;border-radius:0 10px 10px 0;display:flex;align-items:center;justify-content:flex-end;padding-right:.8vw;box-sizing:border-box}
-.caxb b{font-size:clamp(16px,1.5vw,28px);font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
-.caxb.up{background:linear-gradient(90deg,rgba(226,75,74,.35),#E24B4A)}
-.caxb.dn{background:linear-gradient(90deg,rgba(93,202,165,.35),#5DCAA5);color:#04342C}
-.caxb.hoy{background:rgba(241,239,232,.85);color:#13201C}
-.caxb.sc{background:repeating-linear-gradient(135deg,rgba(93,202,165,.55) 0 10px,rgba(93,202,165,.25) 10px 20px);border:2px dashed #5DCAA5;color:#F1EFE8}
-.caxb.sc.up{background:repeating-linear-gradient(135deg,rgba(226,75,74,.6) 0 10px,rgba(226,75,74,.25) 10px 20px);border-color:#E24B4A}
-.caxd{position:absolute;top:50%;transform:translateY(-50%);font-size:clamp(13px,1.05vw,19px);font-weight:700;white-space:nowrap;margin-left:.5vw;padding:.15em .45em;border-radius:6px;background:rgba(14,21,18,.92);z-index:1}
-.caxd.u{color:#F09595}.caxd.d{color:#C0DD97}
-.caxref{position:absolute;top:-1.2vh;bottom:-1.2vh;border-left:2px dashed rgba(241,239,232,.7)}
-.caxsep{height:1px;background:rgba(255,255,255,.12);margin:.4vh 0}
-.caxtag{display:inline-block;margin-left:.5em;font-size:.6em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#04342C;background:#C0DD97;border-radius:999px;padding:.15em .6em;vertical-align:middle}
-.cmt tr.cgl td b{font-weight:900;color:#F1EFE8}
-.cmt tr.cgl td:not(:first-child) small{font-size:.78em;color:rgba(241,239,232,.6);font-weight:600}
 .cmt tr.cdif td small{display:block;font-size:.72em;color:rgba(241,239,232,.6)}
 @media (max-width:1500px){.req .rw{font-size:2.25vw}.req .col{gap:3.6vh}.prf.rec.tc .cx{padding:3.6vh 2.2vw 1.6vh;font-size:2.1vw}}
 .wrap.big{max-width:1600px}
@@ -1578,7 +1554,7 @@ function lbCalc(mi){
 // Pestaña Presentación: resumen para mostrar en TV, letras grandes.
 function renderPres(){
  ['.keys','#hsub','#st'].forEach(q=>{const el=document.querySelector(q);if(el)el.style.display='none';});
- const n=8,nA=4,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
+ const n=7,nA=4,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
  const numA=i=>`<span class="bar" style="right:17vw"><i style="width:${i/nA*100}%"></i></span><span class="num">ANEXO ${i} / ${nA}</span>`;
  const card=(nn,html)=>`<div class="cx"><span class="nn">${nn}</span><div>${html}</div></div>`;
  const row=(nn,t,sub)=>`<div class="rw"><span class="nn">${nn}</span><div>${t}<small>${sub}</small></div></div>`;
@@ -1688,7 +1664,6 @@ function renderPres(){
    const B={ch:MES*2*12,fc:(hT*s1*50+hT*(1-s1)*40.2)*FC*PG};B.t=B.ch+B.fc+COORD;   // estimado 2 lanchas (anexo 3)
    const C={ch:hT*avg};C.t=C.ch+COORD;   // paquete por horas a la tarifa actual (anexo 4)
    const D={ch:hT*NEG};D.t=D.ch+COORD;   // paquete por horas negociado a $175/h
-   const gal=X=>{const g=X.fc/PG,f=v=>'$'+v.toFixed(2);return `<b>${f((BASE_COST-X.ch-COORD)/g)}</b> <small>hoy</small> · <b>${f((C.t-X.ch-COORD)/g)}</b> <small>paquete</small>`;};   // precio del galón que iguala el costo de hoy y el del paquete a la tarifa actual
    const cl=t=>t>BASE_COST?'cup':'cdn';
    const tot=t=>`<b class="${cl(t)}">${kf(t)}</b>`;
    const dif=t=>{const d=t-BASE_COST;return d>0?`<b class="cup">+${kf(d)}</b><small>${p0(d/BASE_COST*100)} más</small>`:`<b class="cdn">−${kf(-d)}</b><small>${p0(-d/BASE_COST*100)} menos</small>`;};
@@ -1700,7 +1675,6 @@ function renderPres(){
     <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td class="cxe">${kf(COORD)}</td><td class="cxe">${kf(COORD)}</td></tr>
     <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td>${tot(A.t)}</td><td>${tot(C.t)}</td><td class="cxe">${tot(B.t)}</td><td class="cxe">${tot(D.t)}</td></tr>
     <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(A.t)}</td><td>${dif(C.t)}</td><td class="cxe">${dif(B.t)}</td><td class="cxe">${dif(D.t)}</td></tr>
-    <tr class="cgl"><td>Galón de diésel para igualar<small>el costo de hoy y el paquete a ${money(avg)}/h</small></td><td></td><td>${gal(A)}</td><td></td><td class="cxe">${gal(B)}</td><td class="cxe"></td></tr>
    </tbody></table>
    <button class="cmtg" data-cmptg="1" title="Mostrar u ocultar las alternativas estimadas"><span class="o1">Ver estimados</span><span class="o2">Ocultar estimados</span><b>›</b></button></div>`;})()}
   </div>
@@ -1737,28 +1711,7 @@ function renderPres(){
    </div>
    <button class="cmtg" data-cmptg="1" title="Mostrar u ocultar las alternativas estimadas"><span class="o1">Ver estimados</span><span class="o2">Ocultar estimados</span><b>›</b></button></div>`;})()}
  </section>
- <section class="sl cax">${num(7)}
-  <p class="kick">Costo anual por alternativa</p>
-  <h2>El paquete por horas reduce el costo actual; la viabilidad del Time Charter <em>depende del precio del diésel</em></h2>
-  ${(()=>{   // Yelko, 23 nov 2026: mismas cuentas del comparativo; escenarios con el diésel a $3 (mismas lanchas, fletamento y galones)
-   const pl=MODELS[0].plan,sh=k=>pl.reduce((t,d)=>t+d[k].filter(e=>!e[6]).reduce((u,e)=>u+e[1]-e[0],0),0)*52;
-   const h1=sh('a'),h2=sh('b'),hs=tH*0.10,hT=h1+h2+hs,s1=h1/(h1+h2),avg=BASE_COST/tH,NEG=175,FC=0.7,PG=6,PE=3;
-   const gA=hT/3*(50+40.2+40.2)*FC,gB=(hT*s1*50+hT*(1-s1)*40.2)*FC,chA=22500*3*12,chB=22500*2*12;
-   const pHoyA=(BASE_COST-chA-COORD)/gA;
-   const D=[
-    ['Time Charter Arpón 24/7','3 lanchas, propuesta, diésel a $6',chA+gA*PG+COORD],
-    ['Time Charter 24/7','2 lanchas, estimado, diésel a $6',chB+gB*PG+COORD],
-    ['Hoy','por hora, a pedido',BASE_COST,'hoy'],
-    ['Paquete por horas','tarifa actual, '+money(avg)+'/h',hT*avg+COORD],
-    ['Paquete por horas','negociado a $175/h',hT*NEG+COORD],
-    ['Time Charter Arpón 24/7, diésel a $3',`3 lanchas, mismo cálculo con el galón a $3<br>Para llegar al costo de hoy (${kf(BASE_COST)}), el diésel debe estar en <b>$${pHoyA.toFixed(2)} el galón</b>`,chA+gA*PE+COORD,'sc'],
-    ['Time Charter 24/7, diésel a $3','2 lanchas, mismo cálculo con el galón a $3',chB+gB*PE+COORD,'sc']];
-   const MX=Math.max(...D.map(d=>d[2]))*1.24,w=v=>(v/MX*100).toFixed(2);
-   return `<div class="caxc">${D.map((d,i)=>{const df=d[2]-BASE_COST,p=Math.round(Math.abs(df)/BASE_COST*100),c=d[3]==='hoy'?'hoy':(d[3]==='sc'?'sc ':'')+(df>0?'up':'dn');
-    const dd=d[3]==='hoy'?'':`<span class="caxd ${df>0?'u':'d'}" style="left:${w(d[2])}%">${df>0?'+':'−'}${kf(Math.abs(df))} · ${p}% ${df>0?'más':'menos'}</span>`;
-    return (i===5?'<div class="caxsep"></div>':'')+`<div class="caxr"><div class="caxl">${d[0]}${d[3]==='sc'?'<span class="caxtag">Escenario</span>':''}<small>${d[1]}</small></div><div class="caxt"><i class="caxref" style="left:${w(BASE_COST)}%"></i><div class="caxb ${c}" style="width:${w(d[2])}%"><b>${kf(d[2])}</b></div>${dd}</div></div>`;}).join('')}</div>`;})()}
- </section>
- <section class="sl">${num(8)}
+ <section class="sl">${num(7)}
   <p class="kick">Recomendaciones para implementar</p>
   <div class="g2 prf rec tc">
    ${card('01',`<b>Coordinador logístico</b><small>Con autoridad para asignar lanchas y definir rutas de MOTI y Trader Tanker. Comanche y spot, solo en casos excepcionales.</small>`)}
