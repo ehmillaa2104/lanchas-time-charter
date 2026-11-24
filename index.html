@@ -768,6 +768,8 @@ html.pmode .pexit:hover{opacity:1}
 .caxref{position:absolute;top:-1.2vh;bottom:-1.2vh;border-left:2px dashed rgba(241,239,232,.7)}
 .caxsep{height:1px;background:rgba(255,255,255,.12);margin:.4vh 0}
 .caxtag{display:inline-block;margin-left:.5em;font-size:.6em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#04342C;background:#C0DD97;border-radius:999px;padding:.15em .6em;vertical-align:middle}
+.cmt tr.cgl td b{font-weight:900;color:#F1EFE8}
+.cmt tr.cgl td:not(:first-child) small{font-size:.78em;color:rgba(241,239,232,.6);font-weight:600}
 .cmt tr.cdif td small{display:block;font-size:.72em;color:rgba(241,239,232,.6)}
 @media (max-width:1500px){.req .rw{font-size:2.25vw}.req .col{gap:3.6vh}.prf.rec.tc .cx{padding:3.6vh 2.2vw 1.6vh;font-size:2.1vw}}
 .wrap.big{max-width:1600px}
@@ -1660,6 +1662,7 @@ function renderPres(){
    const B={ch:MES*2*12,fc:(hT*s1*50+hT*(1-s1)*40.2)*FC*PG};B.t=B.ch+B.fc+COORD;   // estimado 2 lanchas (anexo 3)
    const C={ch:hT*avg};C.t=C.ch+COORD;   // paquete por horas a la tarifa actual (anexo 4)
    const D={ch:hT*NEG};D.t=D.ch+COORD;   // paquete por horas negociado a $175/h
+   const gal=X=>{const g=X.fc/PG,f=v=>'$'+v.toFixed(2);return `<b>${f((BASE_COST-X.ch-COORD)/g)}</b> <small>hoy</small> · <b>${f((C.t-X.ch-COORD)/g)}</b> <small>paquete</small>`;};   // precio del galón que iguala el costo de hoy y el del paquete a la tarifa actual
    const cl=t=>t>BASE_COST?'cup':'cdn';
    const tot=t=>`<b class="${cl(t)}">${kf(t)}</b>`;
    const dif=t=>{const d=t-BASE_COST;return d>0?`<b class="cup">+${kf(d)}</b><small>${p0(d/BASE_COST*100)} más</small>`:`<b class="cdn">−${kf(-d)}</b><small>${p0(-d/BASE_COST*100)} menos</small>`;};
@@ -1671,6 +1674,7 @@ function renderPres(){
     <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td class="cxe">${kf(COORD)}</td><td class="cxe">${kf(COORD)}</td></tr>
     <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td>${tot(A.t)}</td><td>${tot(C.t)}</td><td class="cxe">${tot(B.t)}</td><td class="cxe">${tot(D.t)}</td></tr>
     <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(A.t)}</td><td>${dif(C.t)}</td><td class="cxe">${dif(B.t)}</td><td class="cxe">${dif(D.t)}</td></tr>
+    <tr class="cgl"><td>Galón de diésel para igualar<small>el costo de hoy y el paquete a ${money(avg)}/h</small></td><td></td><td>${gal(A)}</td><td></td><td class="cxe">${gal(B)}</td><td class="cxe"></td></tr>
    </tbody></table>
    <button class="cmtg" data-cmptg="1" title="Mostrar u ocultar las alternativas estimadas"><span class="o1">Ver estimados</span><span class="o2">Ocultar estimados</span><b>›</b></button></div>`;})()}
   </div>
