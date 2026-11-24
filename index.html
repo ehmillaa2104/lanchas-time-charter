@@ -1369,37 +1369,14 @@ function renderProv(){
   return {pax,t,d,fut,l1,l1n,l2,l2n};};
  const all=P.flatMap(p=>p.naves.map(n=>({p,n,e:ev(n)})));
  const bd=(st,txt)=>st==='ok'?`<span class="pvb ok">${txt||'Cumple'}</span>`:st==='alt'?`<span class="pvb alt">${txt||'Alternativa'}</span>`:'<span class="pvb no">No</span>';
- const chip=(x,st)=>{const t=x.n[0].replace(/^(ARPÓN|BALBOA|XTBL) /,'');return `<span class="pvc ${st}">${t.length<3?x.n[0]:t}</span>`;};
- const role=(p,k)=>{const ok=all.filter(x=>x.p===p&&x.e[k]==='ok'),al=all.filter(x=>x.p===p&&x.e[k]==='alt');
-  return ok.length||al.length?ok.map(x=>chip(x,'ok')).join('')+al.map(x=>chip(x,'alt')).join(''):'<span class="pvnone">Ninguna</span>';};
- const cards=P.map(p=>{const both=all.some(x=>x.p===p&&x.e.l1==='ok')&&all.some(x=>x.p===p&&x.e.l2==='ok');
-  const any=all.some(x=>x.p===p&&(x.e.l1!=='no'||x.e.l2!=='no'));
-  return `<div class="pvk${both?' best':''}${any?'':' dim'}"><div class="pvh"><b>${p.corto}</b><small>${p.naves.length} naves</small></div>
-   <div class="pvr"><span>L1 · 44 pax</span><div>${role(p,'l1')}</div></div>
-   <div class="pvr"><span>L2 · 20 pax + carga</span><div>${role(p,'l2')}</div></div>
-   ${both?'<div class="pvtag">Cubre las 2 lanchas</div>':!any?'<div class="pvtag no">No aplica</div>':''}</div>`;}).join('');
- const rows=all.filter(x=>x.e.l1!=='no'||x.e.l2!=='no').sort((a,b)=>{const sc=x=>(x.e.l1==='ok'||x.e.l2==='ok'?0:1);return sc(a)-sc(b);});
  const obs=x=>[x.e.l1==='alt'?`L1: ${x.e.l1n}`:'',x.e.l2==='alt'&&x.e.l2n?`L2: ${x.e.l2n}`:''].filter(Boolean).join(' · ');
- const st=x=>x.e.l1==='ok'||x.e.l2==='ok'?'ok':'alt';
- return `<p class="sub" style="margin:0 0 14px">Requisito del modelo: <b>L1</b> de 44 pasajeros y <b>L2</b> de 20 pasajeros con 6 toneladas o 30 drums.</p>
- <div class="pvlg"><span><i class="ok"></i>Cumple</span><span><i class="alt"></i>Alternativa: cumple con ajustes o está en construcción</span></div>
- <div class="pvg">${cards}</div>
- <section class="cons" style="margin-top:20px"><h2>Conclusión</h2><ul>
-  <li><b>Arpón es el único proveedor que cubre las dos lanchas:</b> Arpón Conquistador como L1 y Arpón Infinity o Arpón Luxury como L2.</li>
-  <li><b>BSS compite por la L2</b> con Balboa Japs y Balboa Cargo. No tiene nave de 44 pasajeros.</li>
-  <li><b>Riesgo:</b> la L1 depende de una sola nave. Se recomienda licitar la L1 y la L2 por separado.</li>
- </ul></section>
- <h3 class="ch3">Naves que cumplen o son alternativa</h3>
- <table class="pvt"><thead><tr><th></th><th>Nave</th><th>Proveedor</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Nudos</th><th>L1</th><th>L2</th><th>Observación</th></tr></thead><tbody>
- ${rows.map(x=>`<tr class="${st(x)}"><td><i class="pvd ${st(x)}"></i></td><td><b>${x.n[0]}</b></td><td>${x.p.corto}</td><td class="n">${sh(x.n[4])}</td><td class="n">${sh(x.n[3])} t · ${sh(x.n[5])} drums</td><td class="n">${sh(x.n[1])}</td><td>${bd(x.e.l1)}</td><td>${bd(x.e.l2)}</td><td class="pvo">${obs(x)}</td></tr>`).join('')}
- </tbody></table>
- <h3 class="ch3">Flota por proveedor</h3>
+ return `<h3 class="ch3" style="margin-top:0">Flota por proveedor</h3>
  ${P.map(p=>{const xs=all.filter(x=>x.p===p),ok=xs.filter(x=>x.e.l1==='ok'||x.e.l2==='ok').length,al=xs.filter(x=>x.e.l1!=='ok'&&x.e.l2!=='ok'&&(x.e.l1==='alt'||x.e.l2==='alt')).length;
   return `<details class="dd pvd2"><summary><span class="pvsn">${p.emp}</span><em>${ok||al?`${ok?`<span class="pvb ok">${ok} ${ok===1?'cumple':'cumplen'}</span>`:''} ${al?`<span class="pvb alt">${al} ${al===1?'alternativa':'alternativas'}</span>`:''}`:'<span class="pvb no">Ninguna cumple</span>'} · ${xs.length} ${xs.length===1?'nave':'naves'}</em></summary>
   <table class="pvt"><thead><tr><th></th><th>Nave</th><th class="n">Pasajeros</th><th class="n">Carga</th><th class="n">Pallets</th><th class="n">Nudos</th><th>L1</th><th>L2</th><th>Observación</th></tr></thead><tbody>
   ${xs.map(x=>{const c=x.e.l1==='ok'||x.e.l2==='ok'?'ok':(x.e.l1==='alt'||x.e.l2==='alt')?'alt':'';return `<tr class="${c}"><td>${c?`<i class="pvd ${c}"></i>`:''}</td><td><b>${x.n[0]}</b>${x.n[6]?` <small>${x.n[6]}</small>`:''}</td><td class="n">${sh(x.n[4])}</td><td class="n">${sh(x.n[3])} t · ${sh(x.n[5])} drums</td><td class="n">${sh(x.n[2])}</td><td class="n">${sh(x.n[1])}</td><td>${bd(x.e.l1)}</td><td>${bd(x.e.l2)}</td><td class="pvo">${obs(x)}</td></tr>`;}).join('')}
   </tbody></table></details>`;}).join('')}
- <p class="note">Fuente: Flota_Lanchas_Consolidado (Arpón, BSS, Marinet y OLS). Pasajeros sentados. Alternativa L1: 30 pasajeros o más. Alternativa L2: 18 pasajeros o más con 4,5 t o 20 drums.</p>`;
+ <p class="note">L1: lancha de 44 pasajeros. L2: lancha de 20 pasajeros con 6 t o 30 drums. Fuente: Flota_Lanchas_Consolidado (Arpón, BSS, Marinet y OLS). Pasajeros sentados. Alternativa L1: 30 pasajeros o más. Alternativa L2: 18 pasajeros o más con 4,5 t o 20 drums.</p>`;
 }
 VIEWS.push({id:'proveedores',name:'Proveedores',r:renderProv});
 
