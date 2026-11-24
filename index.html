@@ -743,6 +743,32 @@ html.pmode .pexit:hover{opacity:1}
 .cmx.open .cmtg b{transform:rotate(180deg)}
 .cmtg .o2,.cmx.open .cmtg .o1{display:none}
 .cmx.open .cmtg .o2{display:inline}
+.dsx{flex:1;min-height:0}
+.dsc{flex:1;position:relative;display:flex;flex-direction:column;justify-content:center;gap:1.2vh;min-width:0}
+.dlg{display:flex;flex-wrap:wrap;gap:.6vh 1.8vw;font-size:clamp(12px,1vw,19px);color:rgba(241,239,232,.85);font-weight:600}
+.dlg span{display:inline-flex;align-items:center;gap:.5em}
+.dlg svg{width:2.2em;height:.8em}
+.dsx:not(.open) .dlg .cxe{display:none}
+.dsv{width:100%;height:auto;display:block}
+.dsv text{font-family:Inter,sans-serif}
+.dgr{stroke:rgba(255,255,255,.08);stroke-width:1}
+.dtk{fill:rgba(241,239,232,.6);font-size:20px;font-variant-numeric:tabular-nums}
+.dax{fill:rgba(241,239,232,.55);font-size:19px;font-weight:600}
+.dln{stroke-width:3;fill:none;stroke-linecap:round}
+.dln.dtc{stroke:#e66767}.dln.dpq{stroke:#199e70}.dln.dhoy{stroke:#F1EFE8}
+.dln.dsh{stroke-dasharray:12 8}
+.dnow{stroke:rgba(241,239,232,.45);stroke-width:2;stroke-dasharray:4 6}
+.dnowt{fill:rgba(241,239,232,.7);font-size:19px;font-weight:700}
+.dlab{fill:#F1EFE8;font-size:21px;font-weight:700}
+.ddot{fill:#F1EFE8;stroke:#121B18;stroke-width:3}
+.dxl{fill:#F1EFE8;font-size:24px;font-weight:900;paint-order:stroke;stroke:#121B18;stroke-width:6px;stroke-linejoin:round}
+.dch{stroke:rgba(241,239,232,.5);stroke-width:1.5}
+.dhit{fill:transparent;cursor:crosshair}
+.dtt{display:none;position:absolute;pointer-events:none;background:rgba(14,21,18,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:.9vh .9vw;font-size:clamp(12px,.95vw,18px);color:#F1EFE8;min-width:15em;z-index:3}
+.dtt b{display:block;margin-bottom:.5vh}
+.dtt span{display:flex;justify-content:space-between;gap:1.2em;color:rgba(241,239,232,.8)}
+.dtt i{font-style:normal;font-weight:800;color:#F1EFE8;font-variant-numeric:tabular-nums}
+.dnote{margin:0;font-size:clamp(12px,.95vw,18px);color:rgba(241,239,232,.6)}
 .cmt .c247{display:inline-block;font-size:.62em;font-weight:800;color:#0E1A16;background:var(--ac1);border-radius:999px;padding:.15em .55em;margin-left:.3em;vertical-align:.2em}
 .cmt .cup{color:#F0716A}
 .cmt .cdn{color:#6FD69B}
@@ -1552,7 +1578,7 @@ function lbCalc(mi){
 // Pestaña Presentación: resumen para mostrar en TV, letras grandes.
 function renderPres(){
  ['.keys','#hsub','#st'].forEach(q=>{const el=document.querySelector(q);if(el)el.style.display='none';});
- const n=7,nA=4,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
+ const n=8,nA=4,num=i=>`<span class="bar"><i style="width:${i/n*100}%"></i></span><span class="num">${String(i).padStart(2,'0')} / ${String(n).padStart(2,'0')}</span>`;
  const numA=i=>`<span class="bar" style="right:17vw"><i style="width:${i/nA*100}%"></i></span><span class="num">ANEXO ${i} / ${nA}</span>`;
  const card=(nn,html)=>`<div class="cx"><span class="nn">${nn}</span><div>${html}</div></div>`;
  const row=(nn,t,sub)=>`<div class="rw"><span class="nn">${nn}</span><div>${t}<small>${sub}</small></div></div>`;
@@ -1679,7 +1705,39 @@ function renderPres(){
    <button class="cmtg" data-cmptg="1" title="Mostrar u ocultar las alternativas estimadas"><span class="o1">Ver estimados</span><span class="o2">Ocultar estimados</span><b>›</b></button></div>`;})()}
   </div>
  </section>
- <section class="sl cax">${num(6)}
+ <section class="sl dsl">${num(6)}
+  <p class="kick">Precio del diésel y punto de equilibrio</p>
+  ${(()=>{   // 24 nov 2026: costo anual de cada alternativa según el precio del galón; mismas cuentas del comparativo
+   const pl=MODELS[0].plan,sh=k=>pl.reduce((t,d)=>t+d[k].filter(e=>!e[6]).reduce((u,e)=>u+e[1]-e[0],0),0)*52;
+   const h1=sh('a'),h2=sh('b'),hs=tH*0.10,hT=h1+h2+hs,s1=h1/(h1+h2),avg=BASE_COST/tH,FC=0.7,PA=6;
+   const gA=hT/3*(50+40.2+40.2)*FC,a0=22500*3*12+COORD,gB=(hT*s1*50+hT*(1-s1)*40.2)*FC,b0=22500*2*12+COORD;
+   const HOY=BASE_COST,P1=hT*avg+COORD,P2=hT*175+COORD;
+   const W=1600,H=640,L=118,R=300,T=36,B=78,pw=W-L-R,ph=H-T-B,XM=7,Y0=5e5,Y1=2.2e6;
+   const X=p=>(L+p/XM*pw).toFixed(1),Y=v=>(T+(Y1-v)/(Y1-Y0)*ph).toFixed(1);
+   const k=v=>v>=1e6?'$'+(v/1e6).toFixed(2)+'M':'$'+Math.round(v/1000)+'k';
+   let g='';
+   for(let v=5e5;v<=2e6+1;v+=2.5e5) g+=`<line class="dgr" x1="${L}" x2="${L+pw}" y1="${Y(v)}" y2="${Y(v)}"/><text class="dtk" x="${L-14}" y="${+Y(v)+7}" text-anchor="end">${k(v)}</text>`;
+   for(let p=0;p<=XM;p++) g+=`<text class="dtk" x="${X(p)}" y="${T+ph+32}" text-anchor="middle">$${p}</text>`;
+   g+=`<text class="dax" x="${L+pw/2}" y="${H-6}" text-anchor="middle">Precio del galón de diésel</text>`;
+   g+=`<line class="dnow" x1="${X(PA)}" x2="${X(PA)}" y1="${T}" y2="${T+ph}"/><text class="dnowt" x="${+X(PA)-10}" y="${T+20}" text-anchor="end">Precio actual $6</text>`;
+   const hl=(v,cl,ex)=>`<line class="dln ${cl}${ex?' cxe':''}" x1="${L}" x2="${L+pw}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+   const sl=(c0,gg,cl,ex)=>`<line class="dln ${cl}${ex?' cxe':''}" x1="${X(0)}" x2="${X(XM)}" y1="${Y(c0)}" y2="${Y(c0+gg*XM)}"/>`;
+   const lab=(v,t,ex,dy=0)=>`<text class="dlab${ex?' cxe':''}" x="${L+pw+14}" y="${+Y(v)+7+dy}">${t}</text>`;
+   const cross=(c0,gg,tv,ex,up)=>{const p=(tv-c0)/gg;if(p<0||p>XM)return '';return `<g class="${ex?'cxe':''}"><circle class="ddot" cx="${X(p)}" cy="${Y(tv)}" r="8"/><text class="dxl" x="${X(p)}" y="${+Y(tv)+(up?-18:34)}" text-anchor="middle">$${p.toFixed(2)}</text></g>`;};
+   g+=hl(HOY,'dhoy')+hl(P1,'dpq')+hl(P2,'dpq dsh',1)+sl(a0,gA,'dtc')+sl(b0,gB,'dtc dsh',1);
+   g+=cross(a0,gA,HOY,0,1)+cross(a0,gA,P1,0,0)+cross(b0,gB,HOY,1,1)+cross(b0,gB,P1,1,0);
+   g+=lab(a0+gA*XM,'Time Charter Arpón')+lab(b0+gB*XM,'Time Charter 2 lanchas',1)+lab(HOY,'Hoy '+k(HOY))+lab(P1,'Paquete '+money(avg)+'/h',0,-4)+lab(P2,'Paquete $175/h',1,10);
+   g+=`<line class="dch" x1="0" x2="0" y1="${T}" y2="${T+ph}" style="display:none"/><rect class="dhit" x="${L}" y="${T}" width="${pw}" height="${ph}"/>`;
+   const lg=(cl,t,ex)=>`<span class="${ex?'cxe':''}"><svg viewBox="0 0 34 10"><line class="dln ${cl}" x1="1" x2="33" y1="5" y2="5"/></svg>${t}</span>`;
+   return `<div class="cmx dsx${CMP_OPEN?' open':''}"><div class="dsc">
+    <div class="dlg">${lg('dtc','Time Charter Arpón, 3 lanchas')}${lg('dtc dsh','Time Charter, 2 lanchas (estimado)',1)}${lg('dhoy','Hoy')}${lg('dpq','Paquete por horas, '+money(avg)+'/h')}${lg('dpq dsh','Paquete por horas, $175/h (estimado)',1)}</div>
+    <svg class="dsv" viewBox="0 0 ${W} ${H}" data-g="${[L,pw,XM,a0,gA,b0,gB,HOY,P1,P2].join(',')}" role="img" aria-label="Costo anual de cada alternativa según el precio del galón de diésel">${g}</svg>
+    <div class="dtt"></div>
+    <p class="dnote">Cada punto marca el precio del galón en que el Time Charter cuesta lo mismo que la alternativa. Consumo al 70% del máximo, ${nfp(hT)} h al año con el spot y coordinador logístico incluido.</p>
+   </div>
+   <button class="cmtg" data-cmptg="1" title="Mostrar u ocultar las alternativas estimadas"><span class="o1">Ver estimados</span><span class="o2">Ocultar estimados</span><b>›</b></button></div>`;})()}
+ </section>
+ <section class="sl cax">${num(7)}
   <p class="kick">Costo anual por alternativa</p>
   <h2>El paquete por horas reduce el costo actual; la viabilidad del Time Charter <em>depende del precio del diésel</em></h2>
   ${(()=>{   // Yelko, 23 nov 2026: mismas cuentas del comparativo; escenarios con el diésel a $3 (mismas lanchas, fletamento y galones)
@@ -1700,7 +1758,7 @@ function renderPres(){
     const dd=d[3]==='hoy'?'':`<span class="caxd ${df>0?'u':'d'}" style="left:${w(d[2])}%">${df>0?'+':'−'}${kf(Math.abs(df))} · ${p}% ${df>0?'más':'menos'}</span>`;
     return (i===5?'<div class="caxsep"></div>':'')+`<div class="caxr"><div class="caxl">${d[0]}${d[3]==='sc'?'<span class="caxtag">Escenario</span>':''}<small>${d[1]}</small></div><div class="caxt"><i class="caxref" style="left:${w(BASE_COST)}%"></i><div class="caxb ${c}" style="width:${w(d[2])}%"><b>${kf(d[2])}</b></div>${dd}</div></div>`;}).join('')}</div>`;})()}
  </section>
- <section class="sl">${num(7)}
+ <section class="sl">${num(8)}
   <p class="kick">Recomendaciones para implementar</p>
   <div class="g2 prf rec tc">
    ${card('01',`<b>Coordinador logístico</b><small>Con autoridad para asignar lanchas y definir rutas de MOTI y Trader Tanker. Comanche y spot, solo en casos excepcionales.</small>`)}
@@ -1905,7 +1963,15 @@ let cur=null;
   if(!dbSaving&&!dbRO)setStatus('ok');
  },err=>{clearTimeout(t);setStatus(err&&err.code==='revoked'?'ro':'err');});
 })();
-document.addEventListener('click',ev=>{const b=ev.target.closest('[data-cmptg]');if(!b)return;CMP_OPEN=!CMP_OPEN;b.closest('.cmx').classList.toggle('open',CMP_OPEN);b.blur();});
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-cmptg]');if(!b)return;CMP_OPEN=!CMP_OPEN;document.querySelectorAll('.cmx').forEach(x=>x.classList.toggle('open',CMP_OPEN));b.blur();});
+document.addEventListener('mousemove',ev=>{const sv=ev.target.closest('.dsv');const all=document.querySelectorAll('.dsv');all.forEach(z=>{if(z!==sv){const c=z.querySelector('.dch');if(c)c.style.display='none';const t=z.parentNode.querySelector('.dtt');if(t)t.style.display='none';}});if(!sv)return;
+ const [L,pw,XM,a0,gA,b0,gB,HOY,P1,P2]=sv.dataset.g.split(',').map(Number),r=sv.getBoundingClientRect(),W=sv.viewBox.baseVal.width,vx=(ev.clientX-r.left)/r.width*W,ch=sv.querySelector('.dch'),tt=sv.parentNode.querySelector('.dtt');
+ if(vx<L||vx>L+pw){ch.style.display='none';tt.style.display='none';return;}
+ const p=(vx-L)/pw*XM,k=v=>v>=1e6?'$'+(v/1e6).toFixed(2)+'M':'$'+Math.round(v/1000)+'k',op=sv.closest('.cmx').classList.contains('open');
+ ch.setAttribute('x1',vx);ch.setAttribute('x2',vx);ch.style.display='';
+ const rows=[['Time Charter Arpón',a0+gA*p],op&&['Time Charter 2 lanchas',b0+gB*p],['Hoy',HOY],['Paquete por horas',P1],op&&['Paquete $175/h',P2]].filter(Boolean);
+ tt.innerHTML='<b>Diésel a $'+p.toFixed(2)+' el galón</b>'+rows.map(x=>'<span>'+x[0]+'<i>'+k(x[1])+'</i></span>').join('');
+ const pr=sv.parentNode.getBoundingClientRect(),lx=ev.clientX-pr.left;tt.style.display='block';tt.style.left=(lx>pr.width*0.6?lx-tt.offsetWidth-18:lx+18)+'px';tt.style.top=(ev.clientY-pr.top-tt.offsetHeight/2)+'px';});
 view.addEventListener('click',ev=>{const g=ev.target.closest('tr.grp');if(!g)return;g.classList.toggle('open');view.querySelectorAll('tr.g'+g.dataset.g).forEach(r=>r.classList.toggle('show'));});
 view.addEventListener('click',ev=>{const b=ev.target.closest('.rst');if(!b)return;MODELS[+b.dataset.m].plan=JSON.parse(ORIG)[+b.dataset.m];save();show(current);});
 view.addEventListener('pointerdown',ev=>{
