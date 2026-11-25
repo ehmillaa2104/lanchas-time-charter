@@ -800,6 +800,8 @@ html.pmode .pexit:hover{opacity:1}
 .lane.pl .ev{z-index:1}
 .ev.tc,.sw.tc{background:#FFF3B8;border:2px dotted #B88A00;color:#5A4400}
 .ll.k3{border-left-color:#B88A00}
+.card small{display:block;margin-top:4px;font-size:12px;color:var(--faint)}
+.hemp{margin-top:14px}
 .lane.pl .ev.t4a{z-index:0}
 .big .ev{font-size:14px;padding:3px 9px;gap:2px}
 .big .px{font-size:12px}
@@ -1144,6 +1146,24 @@ function renderModelKpi(s,mi){
   <h4 class="mdh">Horas por día, MOTI y Trader Tanker</h4>${sem}`)}
  </div>`;
 }
+// Horas por empresa (25 nov 2026, pedido de Esteban, Modelo 3): L1 y L2 sin opcionales; los viajes compartidos (MT) van 50% a cada empresa; la Comanche no suma.
+function horasEmpresa(m){
+ const D=m.plan.map((p,i)=>{let M=0,T=0,C=0;[...(p.a||[]),...(p.b||[])].filter(e=>!e[6]).forEach(e=>{const h=e[1]-e[0];if(e[5]==='M')M+=h;else if(e[5]==='T')T+=h;else if(e[5]==='MT'){M+=h/2;T+=h/2;C+=h;}});return {dia:DAYS[i],M,T,C,tot:M+T};});
+ const S=D.reduce((a,d)=>({M:a.M+d.M,T:a.T+d.T,C:a.C+d.C,tot:a.tot+d.tot}),{M:0,T:0,C:0,tot:0}),pc=v=>S.tot?Math.round(v/S.tot*100)+'%':'0%',n0=v=>String(Math.round(v));   // sin separador de miles: el decimal de esta pestaña es coma
+ return `<h3 class="ch3">Horas por empresa (${m.name})</h3>
+ <div class="cards">
+  <div class="card"><p>Melones (MOTI), horas/semana</p><b>${fmt(S.M)} h</b><small>${pc(S.M)} · ${n0(S.M*52)} h al año</small></div>
+  <div class="card"><p>Trader Tanker, horas/semana</p><b>${fmt(S.T)} h</b><small>${pc(S.T)} · ${n0(S.T*52)} h al año</small></div>
+  <div class="card"><p>Viajes compartidos, horas/semana</p><b>${fmt(S.C)} h</b><small>50% a cada empresa</small></div>
+  <div class="card"><p>Total, horas/semana</p><b>${fmt(S.tot)} h</b><small>${n0(S.tot*52)} h al año</small></div>
+ </div>
+ <table class="hemp"><thead><tr><th>Día</th><th class="n">Melones (MOTI)</th><th class="n">Trader Tanker</th><th class="n">Compartidos (50/50)</th><th class="n">Total</th></tr></thead><tbody>
+ ${D.map(d=>`<tr><td>${d.dia}</td><td class="n">${fmt(d.M)} h</td><td class="n">${fmt(d.T)} h</td><td class="n">${fmt(d.C)} h</td><td class="n">${fmt(d.tot)} h</td></tr>`).join('')}
+ <tr class="tt"><td>Semana</td><td class="n">${fmt(S.M)} h</td><td class="n">${fmt(S.T)} h</td><td class="n">${fmt(S.C)} h</td><td class="n">${fmt(S.tot)} h</td></tr>
+ <tr><td>Año (× 52)</td><td class="n">${n0(S.M*52)} h</td><td class="n">${n0(S.T*52)} h</td><td class="n">${n0(S.C*52)} h</td><td class="n">${n0(S.tot*52)} h</td></tr>
+ </tbody></table>
+ <p class="note">Horas de L1 y L2, sin horarios opcionales. Los viajes compartidos entre Melones y Trader Tanker se reparten 50% para cada empresa (la columna Compartidos muestra sus horas completas, ya incluidas en las dos primeras). La Comanche no suma horas.</p>`;
+}
 function renderModel(m){
  if(m.pool)return renderPool(m);
  const s=stats(m),mi=MODELS.indexOf(m);
@@ -1156,6 +1176,7 @@ function renderModel(m){
  return `<div class="desc">${m.desc.map(d=>`<div><b>${d[0]}</b>${d[1]}</div>`).join('')}</div>
  ${legendH(m)}
  <div class="axrow"><div class="ax">${ax}</div></div>${rows}
+ ${m.id==='modelo-3'?horasEmpresa(m):''}
  ${renderModelKpi(s,mi)}
  <details class="dd mdd" data-mdd="lic"${MDD.has('lic')?' open':''}><summary>Formas de licitar<em>Costo actual por día a superar: ${money(BASE_COST/365)} por las 2 lanchas</em></summary><div class="mddb">${renderLic(m).replace('<h2 class="lich">Formas de licitar</h2>','')}</div></details>`;
 }
