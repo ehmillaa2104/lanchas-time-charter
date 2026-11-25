@@ -794,6 +794,11 @@ html.pmode .pexit:hover{opacity:1}
 .big .ll b{font-size:17px}
 .big .ll small{font-size:13px}
 .big .lane{height:74px}
+.lane.pl{height:calc(var(--lh,54px)*var(--n,1))}
+.big .lane.pl{--lh:74px}
+.lane.pl .ev{bottom:auto;top:calc(var(--r,0)*var(--lh,54px) + 3px);height:calc(var(--lh,54px) - 6px)}
+.lane.pl .ev{z-index:1}
+.lane.pl .ev.t4a{z-index:0}
 .big .ev{font-size:14px;padding:3px 9px;gap:2px}
 .big .px{font-size:12px}
 .big .free{font-size:14px}
@@ -986,8 +991,8 @@ const aViajes=pl=>JSON.parse(JSON.stringify(pl)).map(d=>({t:[...(d.t||[]),...(d.
 const esViajes=pl=>Array.isArray(pl)&&pl.every(d=>Array.isArray(d.t));
 MODELS.push({id:'modelo-2',name:'Modelo 2',pool:1,
  desc:[
-  ['Por viajes','Los viajes no se asignan a una lancha. Cada fila de un día es una lancha más trabajando al mismo tiempo.'],
-  ['Cruces','Si dos viajes se cruzan, el segundo aparece en la fila de abajo.'],
+  ['Por viajes','Los viajes no se asignan a una lancha: cada día tiene un solo carril con todos sus viajes.'],
+  ['Cruces','Si dos viajes se juntan, el segundo baja dentro del mismo carril. Al lado del día se indica cuántas lanchas trabajan a la vez.'],
   ['Diferencia con el Modelo','Mismos viajes, sin las rondas de mediodía.'],
   ['Para la licitación','El proveedor pone las lanchas que hagan falta para cubrir los viajes.']
  ],
@@ -1038,12 +1043,13 @@ const pax=e=>e[7]!==undefined&&e[7]!==null?e[7]:paxOf(e);
 const meta=e=>{const c=e[5]?e[5].split('').map(x=>`<span class="ch c${x}">${x}</span>`).join(''):'';const p=pax(e);
  return `<div class="mt">${c}${p?`<span class="px">${p} pax · ${fmt(e[1]-e[0])} h</span>`:''}</div>`;};
 const typ=(n,e)=>e&&e[6]?'t4a':n.startsWith('Relevo TT')?'t4':n.startsWith('Relevo')?'t1':n.startsWith('Ronda')?'t2':'t3';
-const lane=(ev,key,src,cap)=>{
+const lane=(ev,key,src,cap,rowOf)=>{
  const cl=key.endsWith('|t')?new Set():clashes(src);
  if(!ev.length)return `<div class="lane" data-k="${key}">${vgrid()}<div class="free">Libre</div></div>`;
- return `<div class="lane" data-k="${key}">${vgrid()}${ev.map(e=>{const bad=cl.has(e)||(cap&&pax(e)>cap);
+ const nr=rowOf?Math.max(1,...ev.map(e=>rowOf.get(e)+1)):1;
+ return `<div class="lane${rowOf?' pl':''}" data-k="${key}"${rowOf?` style="--n:${nr}"`:''}>${vgrid()}${ev.map(e=>{const bad=cl.has(e)||(cap&&pax(e)>cap);
   const cls=COLBY==='emp'&&!e[6]?({M:'eM',T:'eT',MT:'eMT'}[e[5]]||'eT'):`${typ(e[2],e)}${e[4]&&!e[6]&&typ(e[2])!=='t4'?'v':''}`;
-  return `<div class="ev ${cls}${bad?' clash':''}" data-i="${src.indexOf(e)}" style="left:${P(e[0])}%;width:${P(e[1])-P(e[0])}%"><i class="hl"></i><b>${e[2]}</b><span>${e[3]}</span>${meta(e)}<i class="hr"></i></div>`;}).join('')}</div>`;};
+  return `<div class="ev ${cls}${bad?' clash':''}" data-i="${src.indexOf(e)}" style="left:${P(e[0])}%;width:${P(e[1])-P(e[0])}%${rowOf?`;--r:${rowOf.get(e)}`:''}"><i class="hl"></i><b>${e[2]}</b><span>${e[3]}</span>${meta(e)}<i class="hr"></i></div>`;}).join('')}</div>`;};
 
 const legendH=()=>{const tg=`<span class="colby"><span class="cbl">Colorear por</span><button class="lbb${COLBY==='tipo'?' on':''}" data-colby="tipo">Tipo de viaje</button><button class="lbb${COLBY==='emp'?' on':''}" data-colby="emp">Empresa</button></span>`;
  const night=`<span><span class="sw swn"></span>Después de las 18:00</span>`;
@@ -1056,9 +1062,10 @@ function renderPool(m){
  const s=stats(m),mi=MODELS.indexOf(m);
  let ax='';for(let h=S;h<=E;h+=2)ax+=`<span style="left:${P(h)}%">${h}:00</span>`;
  let rows='';
- m.plan.forEach((p,i)=>{const pk=pack(p.t);
-  rows+=`<div class="day${i%2?' alt':''}"><div class="dl" style="grid-row:span ${pk.length}"><b>${DAYS[i]}</b><small>${fmt(sum(p.t))} h · ${p.t.filter(e=>!e[6]).length} viajes</small></div>`+
-  pk.map((r,k)=>`<div class="ll k2"><b>${k?'Cruce':'Viajes'}</b></div>${lane(r,`${mi}|${i}|t`,p.t)}`).join('')+`</div>`;});
+ m.plan.forEach((p,i)=>{const pk=pack(p.t.filter(e=>!e[6])),ro=new Map();pk.forEach((r,k)=>r.forEach(e=>ro.set(e,k)));
+  p.t.filter(e=>e[6]).forEach(e=>{const k=pk.findIndex(r=>!r.some(x=>x[0]<e[1]&&e[0]<x[1]));ro.set(e,k<0?0:k);});   // las ventanas opcionales no empujan viajes: van de fondo   // un solo carril: lo que se junta baja (Esteban, 25 nov 2026)
+  rows+=`<div class="day${i%2?' alt':''}"><div class="dl" style="grid-row:span 1"><b>${DAYS[i]}</b><small>${fmt(sum(p.t))} h · ${p.t.filter(e=>!e[6]).length} viajes</small></div>`+
+  `<div class="ll k2"><b>Viajes</b>${pk.length>1?`<small>${pk.length} a la vez</small>`:''}</div>${lane(p.t,`${mi}|${i}|t`,p.t,0,ro)}`+`</div>`;});
  return `<div class="desc">${m.desc.map(d=>`<div><b>${d[0]}</b>${d[1]}</div>`).join('')}</div>
  ${legendH()}
  <div class="axrow"><div class="ax">${ax}</div></div>${rows}
