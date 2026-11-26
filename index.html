@@ -996,7 +996,7 @@ const esViajes=pl=>Array.isArray(pl)&&pl.length>0&&pl.every(d=>Array.isArray(d.t
 // Modelo 2 (creado el 25 nov 2026 como Modelo 3, renombrado el 26 nov): copia del Modelo, por lancha, con la Comanche; los cambios aquí no tocan el Modelo
 const copiaPlan=pl=>JSON.parse(JSON.stringify(pl));
 // Comanche (25 nov 2026, pedido de Esteban): hace la ronda de mediodía los lunes, martes y viernes en un carril propio (c), mismo horario;
-// no suma horas (los totales y el costo usan solo L1 y L2), pero su ronda cuenta para la cobertura. Los jueves la ronda sigue en L1.
+// no suma horas ni cuenta para la cobertura (desde el 26 nov 2026, pedido de Esteban): solo cuentan las lanchas del modelo. Los jueves la ronda sigue en L1.
 const COM_DIAS=[0,1,4],COM_RONDA=[9,11,'Ronda mediodía','9:00–11:00',1,'T',0,10];
 const conComanche=pl=>copiaPlan(pl).map((d,i)=>{d.c=[];if(COM_DIAS.includes(i)){const md=[...(d.a||[]),...(d.b||[])].filter(e=>e[2]==='Ronda mediodía');
  d.a=(d.a||[]).filter(e=>e[2]!=='Ronda mediodía');d.b=(d.b||[]).filter(e=>e[2]!=='Ronda mediodía');d.c=md.length?md:[[...COM_RONDA]];}return d;});
@@ -1093,7 +1093,7 @@ const lane=(ev,key,src,cap,rowOf,xtra)=>{
   const cls=key.endsWith('|c')?'tc':COLBY==='emp'&&!e[6]?({M:'eM',T:'eT',MT:'eMT'}[e[5]]||'eT'):`${typ(e[2],e)}${e[4]&&!e[6]&&typ(e[2])!=='t4'?'v':''}`;
   return `<div class="ev ${cls}${bad?' clash':''}" data-i="${src.indexOf(e)}" style="left:${P(e[0])}%;width:${P(e[1])-P(e[0])}%${rowOf?`;--r:${rowOf.get(e)}`:''}"><i class="hl"></i><b>${e[2]}</b><span>${e[3]}</span>${meta(e)}<i class="hr"></i></div>`;}).join('')}</div>`;};
 
-const legendH=(m)=>{const hc=m&&m.plan.some(p=>p.c&&p.c.length),com=hc&&(!m.pool||COM_VIS)?`<span><span class="sw tc"></span>Comanche: no suma horas</span>`:'';
+const legendH=(m)=>{const hc=m&&m.plan.some(p=>p.c&&p.c.length),com=hc&&(!m.pool||COM_VIS)?`<span><span class="sw tc"></span>Comanche: no suma horas ni cobertura</span>`:'';
  const ctg=hc&&m.pool?`<span class="colby"><span class="cbl">Comanche</span><button class="lbb${COM_VIS?' on':''}" data-comvis="1">Se ve</button><button class="lbb${COM_VIS?'':' on'}" data-comvis="0">Oculta</button></span>`:'';const tg=`<span class="colby"><span class="cbl">Colorear por</span><button class="lbb${COLBY==='tipo'?' on':''}" data-colby="tipo">Tipo de viaje</button><button class="lbb${COLBY==='emp'?' on':''}" data-colby="emp">Empresa</button></span>${ctg}`;
  const night=`${com}<span><span class="sw swn"></span>Después de las 18:00</span>`;
  if(COLBY==='emp')return `<div class="lg lgx">${tg}<span><span class="sw eM"></span>Melones (MOTI)</span><span><span class="sw eT"></span>Trader Tanker</span><span><span class="sw eMT"></span>Compartido MOTI + TT</span><span><span class="sw t4a"></span>Horario opcional</span>${night}</div>`;
@@ -1424,7 +1424,7 @@ function renderLB(){
   body+=`<tr class="tt"><td>${chip('TT')}Trader Tanker: a pedido</td><td class="n">${hc(hPed)}</td><td></td><td></td></tr><tr><td class="ind" style="padding-left:28px">Buceo y emergencias (${nf(CV.ped)} viajes en 12 meses)</td><td class="n">${hc(hPed)}</td><td class="n" colspan="2">Horas libres de las lanchas o spot</td></tr>`;
   body+=`<tr class="tt gt"><td>Total ponderado por horas</td><td class="n">${nf(TH)} h</td><td class="n"><b>${pc(w0/TH)}</b></td><td class="n"><b>${pc(w1/TH)}</b></td></tr>`;
   return `<table><thead><tr><th>Demanda</th><th class="n">Horas al año</th><th class="n">Sale el mismo día</th><th class="n">Con 2 días de aviso</th></tr></thead><tbody>${body}</tbody></table>`;})()}
- <p class="note">Horas al año: horas navegadas en los últimos 12 meses y su peso en el total. Sale el mismo día: el viaje sale el día en que se pidió. Con 2 días de aviso: el viaje se programa con anticipación y sale en una ronda del horario. Lo que no sale el mismo día no se pierde, pasa a la ronda siguiente. Total ponderado: el % de cada demanda pesado por sus horas al año; buceo y emergencias cuentan como 0% porque van fuera del horario.</p>
+ <p class="note">Horas al año: horas navegadas en los últimos 12 meses y su peso en el total. Sale el mismo día: el viaje sale el día en que se pidió. Con 2 días de aviso: el viaje se programa con anticipación y sale en una ronda del horario. Lo que no sale el mismo día no se pierde, pasa a la ronda siguiente. Total ponderado: el % de cada demanda pesado por sus horas al año; buceo y emergencias cuentan como 0% porque van fuera del horario.${MODELS.some(x=>x.name===op&&x.plan.some(p=>p.c&&p.c.length))?' La Comanche no cuenta: solo cubren las lanchas del modelo.':''}</p>
 
  ${u1.pico!==undefined?`<h3 class="ch3">Viajes del ${op}</h3>
  <div class="cards">
@@ -1507,7 +1507,7 @@ function lbEditor(mi){
  const sel=(id,opts,val)=>`<select id="${id}">${opts.map(o=>`<option value="${o[0]}"${String(o[0])===String(val)?' selected':''}>${o[1]}</option>`).join('')}</select>`;
  const form=LB_ED.open||e?`<div class="lbform">
   <label>Día ${sel('lbDia',DAYS.map((d,i)=>[i,d]),v.dia)}</label>
-  <label>${MODELS[mi].pool?'Va en':'Lancha'} ${MODELS[mi].pool?sel('lbLan',[['t','Lanchas del modelo'],['c','Comanche (no suma horas)']],v.lan):sel('lbLan',[['a','L1 (44 pax)'],['b','L2 (20 pax + mat)'],['c','Comanche (no suma horas)']],v.lan)}</label>
+  <label>${MODELS[mi].pool?'Va en':'Lancha'} ${MODELS[mi].pool?sel('lbLan',[['t','Lanchas del modelo'],['c','Comanche (no suma horas ni cobertura)']],v.lan):sel('lbLan',[['a','L1 (44 pax)'],['b','L2 (20 pax + mat)'],['c','Comanche (no suma horas)']],v.lan)}</label>
   <label>Tipo ${sel('lbTipo',LB_TIPOS.map(t=>[t[0],t[0]]),v.tipo)}</label>
   <label>Nombre (si es Otro)<input id="lbNom" value="${v.nombre}" placeholder="ej. Ronda sábado"></label>
   <label>Inicio<input id="lbIni" type="time" step="900" value="${v.ini}"></label>
@@ -1579,8 +1579,8 @@ function lbCalc(mi){
    return {lancha:'Viajes',viajes_sem:ev.length,horas_sem:h,disponible_sem:126,uso_pct:100*h/126,pico,dos};})()]:[['a','L1 (44 pax)',44],['b','L2 (20 pax + carga)',20]].map(([k,lan,cap])=>{const ev=m.plan.flatMap(pl=>lbEv(pl,k));
   const h=ev.reduce((s,e)=>s+e[1]-e[0],0),ph=ev.reduce((s,e)=>s+(e[1]-e[0])*(+e[7]||0),0);
   return {lancha:lan,viajes_sem:ev.length,horas_sem:h,disponible_sem:126,uso_pct:100*h/126,ocupacion_puestos_pct:h?100*ph/(cap*h):0};});
- // parámetros de cada día leídos del horario
- const P=m.plan.map(pl=>{const ev=[...lbEv(pl,'a').map(e=>[e,'a']),...lbEv(pl,'b').map(e=>[e,'b']),...lbEv(pl,'t').map(e=>[e,'a']),...lbEv(pl,'c').map(e=>[e,'a'])],nm=n=>ev.filter(x=>x[0][2]===n).map(x=>x[0]);
+ // parámetros de cada día leídos del horario; la Comanche (c) no cuenta para la cobertura (Esteban, 26 nov 2026)
+ const P=m.plan.map(pl=>{const ev=[...lbEv(pl,'a').map(e=>[e,'a']),...lbEv(pl,'b').map(e=>[e,'b']),...lbEv(pl,'t').map(e=>[e,'a'])],nm=n=>ev.filter(x=>x[0][2]===n).map(x=>x[0]);
   const r=[...nm('Ronda mañana'),...nm('Ronda tarde')];
   return {mat:nm('Materiales').map(e=>+e[7]||0),rel:nm('Relevo TT').map(e=>+e[7]||0),ronda:r.length?Math.min(...r.map(e=>+e[7]||0))-10:null,
    med:ev.filter(x=>x[0][2]==='Ronda mediodía').map(x=>[+x[0][7]||0,x[1]==='a'?3:4])};});
