@@ -798,8 +798,10 @@ html.pmode .pexit:hover{opacity:1}
 .big .lane.pl{--lh:74px}
 .lane.pl .ev{bottom:auto;top:calc(var(--r,0)*var(--lh,54px) + 3px);height:calc(var(--lh,54px) - 6px)}
 .lane.pl .ev{z-index:1}
-.ev.tc,.sw.tc{background:#FFF3B8;border:2px dotted #B88A00;color:#5A4400}
-.ll.k3{border-left-color:#B88A00}
+.ev.tc,.sw.tc{background:transparent;border:2px dotted #1a1a19;color:var(--text)}
+.lane.pl .ev.tc{z-index:2}
+.cmpm td.dn{color:#0F6E56;font-weight:600}.cmpm td.up{color:#A32D2D;font-weight:600}.cmpm tr.cmc td{color:var(--muted)}
+.ll.k3{border-left-color:#1a1a19;border-left-style:dotted}
 .card small{display:block;margin-top:4px;font-size:12px;color:var(--faint)}
 .hemp{margin-top:14px}
 .lane.pl .ev.t4a{z-index:0}
@@ -999,25 +1001,31 @@ const COM_DIAS=[0,1,4],COM_RONDA=[9,11,'Ronda mediodía','9:00–11:00',1,'T',0,
 const conComanche=pl=>copiaPlan(pl).map((d,i)=>{d.c=[];if(COM_DIAS.includes(i)){const md=[...(d.a||[]),...(d.b||[])].filter(e=>e[2]==='Ronda mediodía');
  d.a=(d.a||[]).filter(e=>e[2]!=='Ronda mediodía');d.b=(d.b||[]).filter(e=>e[2]!=='Ronda mediodía');d.c=md.length?md:[[...COM_RONDA]];}return d;});
 const tieneComanche=pl=>Array.isArray(pl)&&pl.some(d=>Array.isArray(d.c));
-MODELS.push({id:'modelo-2',name:'Modelo 2',
+// Modelo 2 en un solo carril por viajes (26 nov 2026, pedido de Esteban): los viajes de L1 y L2 van juntos en t; la Comanche queda aparte en c
+const aPool=pl=>copiaPlan(pl).map(d=>({t:[...(d.t||[]),...(d.a||[]),...(d.b||[])].sort((x,y)=>x[0]-y[0]||x[1]-y[1]),c:d.c||[]}));
+let COM_VIS=true;try{COM_VIS=localStorage.getItem('lanchas-comvis')!=='0';}catch(e){}   // mostrar u ocultar la Comanche en el horario (solo visual)
+MODELS.push({id:'modelo-2',name:'Modelo 2',pool:1,
  desc:[
-  ['Copia del Modelo','Empieza igual al Modelo. Los cambios que hagas aquí no afectan al Modelo.'],
-  ['Comanche','Hace la ronda de mediodía los lunes, martes y viernes, en el mismo horario. Va en amarillo punteado y no suma horas.'],
-  ['Ronda de mediodía','Los jueves sigue en L1. Los demás días de semana no hay ronda de mediodía en L1.'],
+  ['Un solo carril por viajes','Los viajes de las dos lanchas van en un mismo carril. Un viaje baja a otra fila solo si se cruza en hora con otro; si no, va donde cabe.'],
+  ['Comanche','Hace la ronda de mediodía los lunes, martes y viernes, en el mismo horario. Va punteada en negro, no suma horas y se puede mostrar u ocultar.'],
+  ['Ronda de mediodía','Los jueves sigue en las lanchas del modelo. Los demás días de semana la hace la Comanche.'],
   MODELS[0].desc[0]
  ],
- plan:conComanche(MODELS[0].plan)});
+ plan:aPool(conComanche(MODELS[0].plan))});
 const ORIG=JSON.stringify(MODELS.map(m=>m.plan));
 const KEY='lanchas-v58';
 let PLAN_FIX=false;   // si lo guardado viene en un formato anterior, se arregla al cargar y la página lo vuelve a guardar
 const setPlans=d=>{if(!Array.isArray(d)||!d.length||!Array.isArray(d[0]))return false;
  MODELS[0].plan=d[0];
  // Modelo 2: en lo guardado hasta el 26 nov está en d[2] (d[1] era el Modelo 2 por viajes, eliminado); desde entonces en d[1]
- const m2=Array.isArray(d[1])&&d[1].length&&!esViajes(d[1])?d[1]:Array.isArray(d[2])&&d[2].length&&!esViajes(d[2])?d[2]:null;
- if(m2&&tieneComanche(m2))MODELS[1].plan=m2;else{MODELS[1].plan=conComanche(m2||d[0]);PLAN_FIX=true;}
- if(d.length!==MODELS.length||m2!==d[1])PLAN_FIX=true;
+ // desde el 26 nov (tarde) el Modelo 2 va por viajes (t) con la Comanche (c); lo guardado antes por lancha (a, b, c) se convierte al cargar
+ const ok=x=>Array.isArray(x)&&x.length===7;
+ if(ok(d[1])&&esViajes(d[1])&&tieneComanche(d[1]))MODELS[1].plan=d[1];
+ else{const src=ok(d[1])&&!esViajes(d[1])?d[1]:ok(d[2])&&!esViajes(d[2])?d[2]:null;
+  MODELS[1].plan=aPool(src&&tieneComanche(src)?src:conComanche(src||d[0]));PLAN_FIX=true;}
+ if(d.length!==MODELS.length)PLAN_FIX=true;
  return true;};
-const SAVED_PLAN=[[{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9.75,13.75,"Relevo TT","9:45–13:45",1,"T",0,44],[17,24,"Opción relevo TT","desde las 17:00",1,"",1,0]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[9.75,13.25,"Relevo TT","9:45–13:15",1,"T",0,10]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44]],"b":[[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[],"b":[[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,20],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,20]]}],[{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10],[12.5,14.5,"Ronda mediodía","12:30–14:30",1,"T",0,10]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9.75,13.25,"Relevo TT","9:45–13:15",1,"T",0,44],[17,24,"Opción relevo TT","desde las 17:00",1,"",1,0]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[9.75,13.25,"Relevo TT","9:45–13:15",1,"T",0,10]],"c":[]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44]],"b":[[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[]},{"a":[],"b":[[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,20],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,20]],"c":[]}]];
+const SAVED_PLAN=[[{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9.75,13.75,"Relevo TT","9:45–13:45",1,"T",0,44],[17,24,"Opción relevo TT","desde las 17:00",1,"",1,0]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[9.75,13.25,"Relevo TT","9:45–13:15",1,"T",0,10]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]],"b":[[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44]],"b":[[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]]},{"a":[],"b":[[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20],[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,20],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,20]]}],[{"t":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[]},{"t":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10],[12.5,14.5,"Ronda mediodía","12:30–14:30",1,"T",0,10]]},{"t":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[9.75,13.25,"Relevo TT","9:45–13:15",1,"T",0,44],[9.75,13.25,"Relevo TT","9:45–13:15",1,"T",0,10],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[17,24,"Opción relevo TT","desde las 17:00",1,"",1,0],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[]},{"t":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[]},{"t":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[7,9.5,"Ronda mañana","7:00–9:30",0,"MT",0,20],[10,14,"Materiales","10:00–14:00",1,"T",0,5],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[14.5,17.25,"Ronda tarde","14:30–17:15",0,"MT",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[[9,11,"Ronda mediodía","9:00–11:00",1,"T",0,10]]},{"t":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,44],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,44],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[]},{"t":[[6,8.25,"Relevo MOTI","6:00–8:15",0,"M",0,20],[14,16.25,"Relevo MOTI","14:00–16:15",0,"M",0,20],[22,24,"Relevo MOTI","22:00–24:00",0,"M",0,20]],"c":[]}]];
 setPlans(SAVED_PLAN);
 try{setPlans(JSON.parse(localStorage.getItem(KEY)||'null'));}catch(err){}
 const DBDOC='planes/v58',DBVER=1;
@@ -1041,9 +1049,9 @@ function clashes(arr){const s=new Set(),l=arr.filter(e=>!e[6]);for(let i=0;i<l.l
 const sum=a=>a.reduce((s,e)=>s+(e[6]?0:e[1]-e[0]),0);
 const fmt=n=>(Math.round(n*10)/10).toString().replace('.',',');
 function stats(m){
- if(m.pool){let tot=0,mat=0,matD=0,vt=0,peak=0;
-  m.plan.forEach(p=>{tot+=sum(p.t);vt+=p.t.filter(e=>!e[6]).length;const mm=p.t.filter(e=>e[2]==='Materiales');mat+=sum(mm);if(mm.length)matD++;peak=Math.max(peak,pack(p.t.filter(e=>!e[6])).length);});
-  return {pool:1,tot,mat,matD,vt,peak};}
+ if(m.pool){let tot=0,mat=0,matD=0,vt=0,peak=0,com=0,vc=0;
+  m.plan.forEach(p=>{tot+=sum(p.t);vt+=p.t.filter(e=>!e[6]).length;const mm=p.t.filter(e=>e[2]==='Materiales');mat+=sum(mm);if(mm.length)matD++;peak=Math.max(peak,pack(p.t.filter(e=>!e[6])).length);com+=sum(p.c||[]);vc+=(p.c||[]).filter(e=>!e[6]).length;});
+  return {pool:1,tot,mat,matD,vt,peak,com,vc};}
  let peak=0;m.plan.forEach(p=>{peak=Math.max(peak,pack([...p.a,...p.b].filter(e=>!e[6])).length);});
  let l1=0,l2=0,mat=0,matD=0,free=0,rondL1=0,v1=0,v2=0;
  m.plan.forEach(p=>{l1+=sum(p.a);l2+=sum(p.b);v1+=p.a.filter(e=>!e[6]).length;v2+=p.b.filter(e=>!e[6]).length;
@@ -1051,7 +1059,8 @@ function stats(m){
   if(!p.b.length)free++;
   rondL1+=sum(p.a.filter(e=>e[2].startsWith('Ronda')));
  });
- return {l1,l2,tot:l1+l2,mat,matD,free,rondL1,v1,v2,vt:v1+v2,peak};
+ const com=m.plan.reduce((a,p)=>a+sum(p.c||[]),0),vc=m.plan.reduce((a,p)=>a+(p.c||[]).filter(e=>!e[6]).length,0);
+ return {l1,l2,tot:l1+l2,mat,matD,free,rondL1,v1,v2,vt:v1+v2,peak,com,vc};
 }
 let COLBY='tipo';try{COLBY=localStorage.getItem('lanchas-colby')||'tipo';}catch(e){}
 const vgrid=()=>{let s=`<div class="night" style="left:${P(18)}%"></div>`;for(let h=S+2;h<E;h+=2)s+=`<div class="vl${h===18?' v18':''}" style="left:${P(h)}%"></div>`;return s;};
@@ -1060,19 +1069,22 @@ const pax=e=>e[7]!==undefined&&e[7]!==null?e[7]:paxOf(e);
 const meta=e=>{const c=e[5]?e[5].split('').map(x=>`<span class="ch c${x}">${x}</span>`).join(''):'';const p=pax(e);
  return `<div class="mt">${c}${p?`<span class="px">${p} pax · ${fmt(e[1]-e[0])} h</span>`:''}</div>`;};
 const typ=(n,e)=>e&&e[6]?'t4a':n.startsWith('Relevo TT')?'t4':n.startsWith('Relevo')?'t1':n.startsWith('Ronda')?'t2':'t3';
-const lane=(ev,key,src,cap,rowOf)=>{
- const cl=key.endsWith('|t')?new Set():clashes(src);
- if(!ev.length)return `<div class="lane" data-k="${key}">${vgrid()}<div class="free">Libre</div></div>`;
- const nr=rowOf?Math.max(1,...ev.map(e=>rowOf.get(e)+1)):1;
- return `<div class="lane${rowOf?' pl':''}" data-k="${key}"${rowOf?` style="--n:${nr}"`:''}>${vgrid()}${ev.map(e=>{const bad=cl.has(e)||(cap&&pax(e)>cap);
+const lane=(ev,key,src,cap,rowOf,xtra)=>{
+ const cl=key.endsWith('|t')?new Set():clashes(src),xs=xtra||[];
+ if(!ev.length&&!xs.length)return `<div class="lane" data-k="${key}">${vgrid()}<div class="free">Libre</div></div>`;
+ const nr=rowOf?Math.max(1,...ev.map(e=>rowOf.get(e)+1),...xs.map(x=>x.r+1)):1;
+ const xh=xs.map(x=>{const e=x.e;return `<div class="ev tc" data-k="${x.k}" data-i="${x.i}" style="left:${P(e[0])}%;width:${P(e[1])-P(e[0])}%;--r:${x.r}"><i class="hl"></i><b>Comanche</b><span>${e[3]}</span>${meta(e)}<i class="hr"></i></div>`;}).join('');
+ return `<div class="lane${rowOf?' pl':''}" data-k="${key}"${rowOf?` style="--n:${nr}"`:''}>${vgrid()}${xh}${ev.map(e=>{const bad=cl.has(e)||(cap&&pax(e)>cap);
   const cls=key.endsWith('|c')?'tc':COLBY==='emp'&&!e[6]?({M:'eM',T:'eT',MT:'eMT'}[e[5]]||'eT'):`${typ(e[2],e)}${e[4]&&!e[6]&&typ(e[2])!=='t4'?'v':''}`;
   return `<div class="ev ${cls}${bad?' clash':''}" data-i="${src.indexOf(e)}" style="left:${P(e[0])}%;width:${P(e[1])-P(e[0])}%${rowOf?`;--r:${rowOf.get(e)}`:''}"><i class="hl"></i><b>${e[2]}</b><span>${e[3]}</span>${meta(e)}<i class="hr"></i></div>`;}).join('')}</div>`;};
 
-const legendH=(m)=>{const com=m&&m.plan.some(p=>p.c&&p.c.length)?`<span><span class="sw tc"></span>Comanche: no suma horas</span>`:'';const tg=`<span class="colby"><span class="cbl">Colorear por</span><button class="lbb${COLBY==='tipo'?' on':''}" data-colby="tipo">Tipo de viaje</button><button class="lbb${COLBY==='emp'?' on':''}" data-colby="emp">Empresa</button></span>`;
+const legendH=(m)=>{const hc=m&&m.plan.some(p=>p.c&&p.c.length),com=hc&&(!m.pool||COM_VIS)?`<span><span class="sw tc"></span>Comanche: no suma horas</span>`:'';
+ const ctg=hc&&m.pool?`<span class="colby"><span class="cbl">Comanche</span><button class="lbb${COM_VIS?' on':''}" data-comvis="1">Se ve</button><button class="lbb${COM_VIS?'':' on'}" data-comvis="0">Oculta</button></span>`:'';const tg=`<span class="colby"><span class="cbl">Colorear por</span><button class="lbb${COLBY==='tipo'?' on':''}" data-colby="tipo">Tipo de viaje</button><button class="lbb${COLBY==='emp'?' on':''}" data-colby="emp">Empresa</button></span>${ctg}`;
  const night=`${com}<span><span class="sw swn"></span>Después de las 18:00</span>`;
  if(COLBY==='emp')return `<div class="lg lgx">${tg}<span><span class="sw eM"></span>Melones (MOTI)</span><span><span class="sw eT"></span>Trader Tanker</span><span><span class="sw eMT"></span>Compartido MOTI + TT</span><span><span class="sw t4a"></span>Horario opcional</span>${night}</div>`;
  return `<div class="lg lgx">${tg}<span><span class="sw t1"></span>Relevo MOTI</span><span><span class="sw t2"></span>Rondas de personal</span><span><span class="sw t3"></span>Materiales</span><span><span class="sw t4"></span>Relevo TT</span><span><span class="sw t4a"></span>Horario opcional relevo TT</span>${night}</div>
 <div class="lg" style="margin-bottom:14px"><span><span class="ch cM">M</span>Melones</span><span><span class="ch cT">T</span>Trader Tanker</span></div>`;};
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-comvis]');if(!b)return;COM_VIS=b.dataset.comvis==='1';try{localStorage.setItem('lanchas-comvis',COM_VIS?'1':'0');}catch(e){}const y=window.scrollY;show(current);window.scrollTo(0,y);});
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-colby]');if(!b)return;COLBY=b.dataset.colby;try{localStorage.setItem('lanchas-colby',COLBY);}catch(e){}const y=window.scrollY;show(current);window.scrollTo(0,y);});
 
 function renderPool(m){
@@ -1080,18 +1092,20 @@ function renderPool(m){
  let ax='';for(let h=S;h<=E;h+=2)ax+=`<span style="left:${P(h)}%">${h}:00</span>`;
  let rows='';
  m.plan.forEach((p,i)=>{const pk=pack(p.t.filter(e=>!e[6])),ro=new Map();pk.forEach((r,k)=>r.forEach(e=>ro.set(e,k)));
-  p.t.filter(e=>e[6]).forEach(e=>{const k=pk.findIndex(r=>!r.some(x=>x[0]<e[1]&&e[0]<x[1]));ro.set(e,k<0?0:k);});   // las ventanas opcionales no empujan viajes: van de fondo   // un solo carril: lo que se junta baja (Esteban, 25 nov 2026)
-  rows+=`<div class="day${i%2?' alt':''}"><div class="dl" style="grid-row:span 1"><b>${DAYS[i]}</b><small>${fmt(sum(p.t))} h · ${p.t.filter(e=>!e[6]).length} viajes</small></div>`+
-  `<div class="ll k2"><b>Viajes</b>${pk.length>1?`<small>${pk.length} a la vez</small>`:''}</div>${lane(p.t,`${mi}|${i}|t`,p.t,0,ro)}`+`</div>`;});
+  // un solo carril (Esteban, 26 nov 2026): un viaje baja solo si se cruza con otro; las ventanas opcionales no empujan viajes, van de fondo
+  p.t.filter(e=>e[6]).forEach(e=>{const k=pk.findIndex(r=>!r.some(x=>x[0]<e[1]&&e[0]<x[1]));ro.set(e,k<0?0:k);});
+  // la Comanche va en la primera fila donde cabe sin cruzarse con nada; si no cabe, abre una fila nueva
+  const occ=pk.map(r=>[...r]);p.t.filter(e=>e[6]).forEach(e=>{(occ[ro.get(e)]||(occ[ro.get(e)]=[])).push(e);});
+  const xs=[];if(COM_VIS)(p.c||[]).map((e,j)=>[e,j]).sort((x,y)=>x[0][0]-y[0][0]).forEach(([e,j])=>{let k=occ.findIndex(r=>!r.some(x=>x[0]<e[1]&&e[0]<x[1]));if(k<0){occ.push([]);k=occ.length-1;}occ[k].push(e);xs.push({e,i:j,r:k,k:`${mi}|${i}|c`});});
+  const nc=(p.c||[]).filter(e=>!e[6]).length;
+  rows+=`<div class="day${i>4?' wkd':''}${i%2?' alt':''}"><div class="dl" style="grid-row:span 1"><b>${DAYS[i]}</b><small>${fmt(sum(p.t))} h · ${p.t.filter(e=>!e[6]).length} viajes${nc&&!COM_VIS?` · Comanche oculta`:''}</small></div>`+
+  `<div class="ll k2"><b>Viajes</b>${pk.length>1?`<small>${pk.length} lanchas a la vez</small>`:''}</div>${lane(p.t,`${mi}|${i}|t`,p.t,0,ro,xs)}`+`</div>`;});
  return `<div class="desc">${m.desc.map(d=>`<div><b>${d[0]}</b>${d[1]}</div>`).join('')}</div>
- ${legendH()}
+ ${legendH(m)}
  <div class="axrow"><div class="ax">${ax}</div></div>${rows}
- <div class="cards">
-  <div class="card"><p>Total semanal</p><b>${fmt(s.tot)} h</b></div>
-  <div class="card"><p>Materiales, horas/semana</p><b>${fmt(s.mat)} h</b></div>
-  <div class="card"><p>Total viajes/semana</p><b>${s.vt}</b></div>
-  <div class="card"><p>Lanchas al mismo tiempo (máx.)</p><b>${s.peak}</b></div>
- </div>`;
+ ${horasEmpresa(m)}
+ ${renderModelKpi(s,mi)}
+ <details class="dd mdd" data-mdd="lic"${MDD.has('lic')?' open':''}><summary>Formas de licitar<em>Costo actual por día a superar: ${money(BASE_COST/365)} por las 2 lanchas</em></summary><div class="mddb">${renderLic(m).replace('<h2 class="lich">Formas de licitar</h2>','')}</div></details>`;
 }
 function semChart(sem,cap){
  const CM='#3B6D11',CT='#2C2C2A',nf=(v,d=0)=>Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1104,13 +1118,21 @@ function semChart(sem,cap){
   g+=`<text x="${x+w/2}" y="${yM-22}" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a19">${nf(d.total,1)} h</text><text x="${x+w/2}" y="${yM-7}" text-anchor="middle" font-size="11" font-weight="600" fill="#0F6E56">${pc}% uso</text><text x="${x+w/2}" y="${H-B+16}" text-anchor="middle" font-size="12" fill="#3d3c38">${d.dia}</text>`;});
  return `<div class="lg"><span><span class="sw" style="background:${CM}"></span>MOTI</span><span><span class="sw" style="background:${CT}"></span>Trader Tanker</span><span><span class="sw" style="background:rgba(255,255,255,.7);border:1px dashed rgba(11,11,11,.35)"></span>Disponible: ${cap} h por día (2 lanchas × 18 h)</span></div><svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block" role="img">${g}</svg>`;
 }
-function heatUso(plan){
+function heatUso(plan,pool){
  const H=[];for(let h=S;h<E;h++)H.push(h);
- const occ=(ev,h)=>ev.filter(e=>!e[6]).reduce((a,e)=>a+Math.max(0,Math.min(e[1],h+1)-Math.max(e[0],h)),0);
- const pk=(k,days,a,b)=>Math.round(days.reduce((t,i)=>t+H.filter(h=>h>=a&&h<b).reduce((w,h)=>w+Math.min(1,occ(plan[i][k],h)),0),0)/(days.length*(b-a))*100);
+ const occ=(ev,h)=>(ev||[]).filter(e=>!e[6]).reduce((a,e)=>a+Math.max(0,Math.min(e[1],h+1)-Math.max(e[0],h)),0);
+ const pk=(k,days,a,b,cap=1)=>Math.round(days.reduce((t,i)=>t+H.filter(h=>h>=a&&h<b).reduce((w,h)=>w+Math.min(cap,occ(plan[i][k],h)),0),0)/(days.length*(b-a)*cap)*100);
  const WD=[0,1,2,3,4],WE=[5,6],ALL7=[0,1,2,3,4,5,6];
  const sem=v=>v>=50?'g':v>=25?'y':'r',lab={g:'Buen uso',y:'Uso bajo',r:'Casi libre'};
  const cell=v=>{const c=sem(v);return `<td class="umc ${c}"><div><b>${v}%</b><span>${v===0?'Libre':lab[c]}</span></div><i style="width:${v}%"></i></td>`;};
+ if(pool){const row=(t,days,a,b)=>`<tr><th>${t}</th>${cell(pk('t',days,a,b,2))}</tr>`;
+  return {html:`<table class="um"><thead><tr><th></th><th><div class="umb"><b>2</b><span>Las 2 lanchas juntas<small>viajes del carril único, sin la Comanche</small></span></div></th></tr></thead><tbody>
+  <tr class="umg"><td colspan="2">Lunes a viernes</td></tr>${row('6:00 a 18:00',WD,6,18)}${row('18:00 a 24:00',WD,18,24)}
+  <tr class="umg"><td colspan="2">Sábado y domingo</td></tr>${row('6:00 a 18:00',WE,6,18)}${row('18:00 a 24:00',WE,18,24)}
+  <tr class="umg"><td colspan="2">Total</td></tr>${row('Toda la semana',ALL7,6,24)}
+  </tbody></table>
+  <div class="uflg" style="margin-top:10px"><span><i class="g"></i>Buen uso: 50% o más</span><span><i class="y"></i>Uso bajo: 25% a 49%</span><span><i class="r"></i>Casi libre: menos de 25%</span></div>`,
+   n17:`2 lanchas ${pk('t',ALL7,18,24,2)}%`,we:`2 lanchas ${pk('t',WE,6,24,2)}%`};}
  const row=(t,days,a,b)=>`<tr><th>${t}</th>${cell(pk('a',days,a,b))}${cell(pk('b',days,a,b))}</tr>`;
  return {html:`<table class="um"><thead><tr><th></th><th><div class="umb"><b>L1</b><span>Lancha 1<small>44 pasajeros</small></span></div></th><th><div class="umb"><b>L2</b><span>Lancha 2<small>20 pasajeros + carga</small></span></div></th></tr></thead><tbody>
   <tr class="umg"><td colspan="3">Lunes a viernes</td></tr>${row('6:00 a 18:00',WD,6,18)}${row('18:00 a 24:00',WD,18,24)}
@@ -1125,25 +1147,41 @@ document.addEventListener('toggle',ev=>{const d=ev.target;if(d&&d.dataset&&d.dat
 function renderModelKpi(s,mi){
  const HA=7104,HS=136.6,DISP=126,DIA=36,ha=s.tot*52,uw=Math.round(s.tot/(DISP*2)*100);
  const dif=(v,b)=>{const x=Math.round((v-b)/b*100);return `${x>0?'+':''}${x}%`;};
- const n0=v=>Math.round(v).toLocaleString('en-US');
+ const n0=v=>String(Math.round(v));   // sin separador de miles: el decimal de esta pestaña es coma
  const bar=(n,h)=>`<div class="br"><div class="bl"><b>${n}</b></div><div class="bt lbfree"><div class="bf" style="width:${Math.min(100,h/DISP*100)}%;background:#0F6E56" title="${fmt(h)} h navegadas"></div></div><div class="bv">${fmt(h)} de ${DISP} h · ${Math.round(h/DISP*100)}%</div></div>`;
  const box=(k,t,em,body)=>`<details class="dd mdd" data-mdd="${k}"${MDD.has(k)?' open':''}><summary>${t}<em>${em}</em></summary><div class="mddb">${body}</div></details>`;
  let sem='';try{sem=semChart(lbCalc(mi).sem,DIA);}catch(e){}
- const hu=heatUso(MODELS[mi].plan);
+ const hu=heatUso(MODELS[mi].plan,MODELS[mi].pool),cm=mi>0?compModelo(mi):null;
  return `<div class="mdds">
- ${box('ind','Indicadores del modelo',`${fmt(s.tot)} h/sem (${dif(s.tot,HS)} frente a hoy) · uso ${uw}% · después de las 18:00: ${hu.n17}`,`
+ ${box('ind','Indicadores del modelo',`${fmt(s.tot)} h/sem (${dif(s.tot,HS)} frente a hoy${cm?`, ${cm.res} frente al ${MODELS[0].name}`:''}) · uso ${uw}% · después de las 18:00: ${hu.n17}`,`
   <div class="cards mkpi3">
    <div class="card"><p>Horas por semana</p><b>${fmt(s.tot)} h</b><small>Actual: ${fmt(HS)} h · <span class="dlt">${dif(s.tot,HS)}</span></small></div>
    <div class="card"><p>Horas al año</p><b>${n0(ha)} h</b><small>Actual: ${n0(HA)} h · <span class="dlt">${dif(ha,HA)}</span></small></div>
    <div class="card"><p>Uso de las 2 lanchas</p><b>${uw}%</b><small>${fmt(s.tot)} de ${DISP*2} h disponibles por semana</small></div>
   </div>
-  <h4 class="mdh">Uso de cada lancha por franja horaria</h4>${hu.html}
+  ${cm?cm.html:''}
+  <h4 class="mdh">${MODELS[mi].pool?'Uso de las 2 lanchas por franja horaria':'Uso de cada lancha por franja horaria'}</h4>${hu.html}
   <h4 class="mdh">Horas por día, MOTI y Trader Tanker</h4>${sem}`)}
  </div>`;
 }
-// Horas por empresa (25 nov 2026, pedido de Esteban, Modelo 3): L1 y L2 sin opcionales; los viajes compartidos (MT) van 50% a cada empresa; la Comanche no suma.
+// Horas por empresa (25 nov 2026, pedido de Esteban, Modelo 3): viajes de las lanchas sin opcionales; los viajes compartidos (MT) van 50% a cada empresa; la Comanche no suma.
+function horasEmp(m){let M=0,T=0;m.plan.forEach(p=>[...(p.a||[]),...(p.b||[]),...(p.t||[])].filter(e=>!e[6]).forEach(e=>{const h=e[1]-e[0];if(e[5]==='M')M+=h;else if(e[5]==='T')T+=h;else if(e[5]==='MT'){M+=h/2;T+=h/2;}}));return {M,T};}
+// Comparación con el Modelo original (26 nov 2026, pedido de Esteban): horas y viajes del modelo contra el Modelo
+function compModelo(mi){
+ const a=stats(MODELS[0]),b=stats(MODELS[mi]),ea=horasEmp(MODELS[0]),eb=horasEmp(MODELS[mi]),n0=v=>String(Math.round(v));
+ const df=(x,y,f,u)=>{const d=y-x,r=Math.abs(d)<0.05?0:d,pc=x?Math.round(r/x*100):0;return {t:r===0?'Igual':`${r>0?'+':'-'}${f(Math.abs(r))}${u}${x?` (${pc>0?'+':''}${pc}%)`:''}`,c:r<0?'dn':r>0?'up':''};};
+ const R=[['Horas por semana',a.tot,b.tot,fmt,' h'],['Horas al año (× 52)',a.tot*52,b.tot*52,n0,' h'],['Melones (MOTI), horas/semana',ea.M,eb.M,fmt,' h'],['Trader Tanker, horas/semana',ea.T,eb.T,fmt,' h'],
+  ['Viajes por semana',a.vt,b.vt,v=>String(Math.round(v)),''],['Lanchas a la vez (máximo)',a.peak,b.peak,v=>String(Math.round(v)),'']];
+ const d0=df(a.tot,b.tot,fmt,' h');
+ return {res:d0.t==='Igual'?'igual':d0.t.replace(/ \(.*\)/,''),html:`<h4 class="mdh">${MODELS[mi].name} frente al ${MODELS[0].name}</h4>
+ <table class="hemp cmpm"><thead><tr><th>Indicador</th><th class="n">${MODELS[0].name}</th><th class="n">${MODELS[mi].name}</th><th class="n">Diferencia</th></tr></thead><tbody>
+ ${R.map(([n,x,y,f,u])=>{const d=df(x,y,f,u);return `<tr><td>${n}</td><td class="n">${f(x)}${u}</td><td class="n">${f(y)}${u}</td><td class="n ${d.c}">${d.t}</td></tr>`;}).join('')}
+ <tr class="cmc"><td>Comanche, horas/semana (no suman)</td><td class="n">${fmt(a.com)} h</td><td class="n">${fmt(b.com)} h</td><td class="n">${b.vc} ${b.vc===1?'viaje':'viajes'} por semana</td></tr>
+ </tbody></table>
+ <p class="note">Horas de las lanchas sin horarios opcionales ni la Comanche. En verde, lo que baja frente al ${MODELS[0].name}; en rojo, lo que sube.</p>`};
+}
 function horasEmpresa(m){
- const D=m.plan.map((p,i)=>{let M=0,T=0,C=0;[...(p.a||[]),...(p.b||[])].filter(e=>!e[6]).forEach(e=>{const h=e[1]-e[0];if(e[5]==='M')M+=h;else if(e[5]==='T')T+=h;else if(e[5]==='MT'){M+=h/2;T+=h/2;C+=h;}});return {dia:DAYS[i],M,T,C,tot:M+T};});
+ const D=m.plan.map((p,i)=>{let M=0,T=0,C=0;[...(p.a||[]),...(p.b||[]),...(p.t||[])].filter(e=>!e[6]).forEach(e=>{const h=e[1]-e[0];if(e[5]==='M')M+=h;else if(e[5]==='T')T+=h;else if(e[5]==='MT'){M+=h/2;T+=h/2;C+=h;}});return {dia:DAYS[i],M,T,C,tot:M+T};});
  const S=D.reduce((a,d)=>({M:a.M+d.M,T:a.T+d.T,C:a.C+d.C,tot:a.tot+d.tot}),{M:0,T:0,C:0,tot:0}),pc=v=>S.tot?Math.round(v/S.tot*100)+'%':'0%',n0=v=>String(Math.round(v));   // sin separador de miles: el decimal de esta pestaña es coma
  return `<h3 class="ch3">Horas por empresa (${m.name})</h3>
  <div class="cards">
@@ -1157,7 +1195,7 @@ function horasEmpresa(m){
  <tr class="tt"><td>Semana</td><td class="n">${fmt(S.M)} h</td><td class="n">${fmt(S.T)} h</td><td class="n">${fmt(S.C)} h</td><td class="n">${fmt(S.tot)} h</td></tr>
  <tr><td>Año (× 52)</td><td class="n">${n0(S.M*52)} h</td><td class="n">${n0(S.T*52)} h</td><td class="n">${n0(S.C*52)} h</td><td class="n">${n0(S.tot*52)} h</td></tr>
  </tbody></table>
- <p class="note">Horas de L1 y L2, sin horarios opcionales. Los viajes compartidos entre Melones y Trader Tanker se reparten 50% para cada empresa (la columna Compartidos muestra sus horas completas, ya incluidas en las dos primeras). La Comanche no suma horas.</p>`;
+ <p class="note">Horas de las lanchas, sin horarios opcionales. Los viajes compartidos entre Melones y Trader Tanker se reparten 50% para cada empresa (la columna Compartidos muestra sus horas completas, ya incluidas en las dos primeras). La Comanche no suma horas.</p>`;
 }
 function renderModel(m){
  if(m.pool)return renderPool(m);
@@ -1454,11 +1492,11 @@ const lbNum=s=>{const m=String(s).match(/^(\d{1,2}):(\d{2})/);return m?(+m[1])+(
 function lbEditor(mi){
  const e=LB_ED.edit&&LB_ED.edit.mi===mi?LB_ED.edit:null,it=e?e.item:null;
  const nm=it?it[2]:'Ronda mañana',known=LB_TIPOS.some(t=>t[0]===nm&&t[0]!=='Otro');
- const v={dia:e?e.di:0,lan:e?e.k:'b',tipo:known?nm:'Otro',nombre:known?'':nm,ini:it?lbHora(it[0]):'08:00',fin:it?lbHora(it[1]):'10:00',emp:it?it[5]:'MT',pax:it?pax(it):20,opc:it?!!it[6]:false};
+ const v={dia:e?e.di:0,lan:e?e.k:MODELS[mi].pool?'t':'b',tipo:known?nm:'Otro',nombre:known?'':nm,ini:it?lbHora(it[0]):'08:00',fin:it?lbHora(it[1]):'10:00',emp:it?it[5]:'MT',pax:it?pax(it):20,opc:it?!!it[6]:false};
  const sel=(id,opts,val)=>`<select id="${id}">${opts.map(o=>`<option value="${o[0]}"${String(o[0])===String(val)?' selected':''}>${o[1]}</option>`).join('')}</select>`;
  const form=LB_ED.open||e?`<div class="lbform">
   <label>Día ${sel('lbDia',DAYS.map((d,i)=>[i,d]),v.dia)}</label>
-  <label>${MODELS[mi].pool?'Viaje':'Lancha'} ${MODELS[mi].pool?sel('lbLan',[['t','Cualquier lancha']],'t'):sel('lbLan',[['a','L1 (44 pax)'],['b','L2 (20 pax + mat)'],['c','Comanche (no suma horas)']],v.lan)}</label>
+  <label>${MODELS[mi].pool?'Va en':'Lancha'} ${MODELS[mi].pool?sel('lbLan',[['t','Lanchas del modelo'],['c','Comanche (no suma horas)']],v.lan):sel('lbLan',[['a','L1 (44 pax)'],['b','L2 (20 pax + mat)'],['c','Comanche (no suma horas)']],v.lan)}</label>
   <label>Tipo ${sel('lbTipo',LB_TIPOS.map(t=>[t[0],t[0]]),v.tipo)}</label>
   <label>Nombre (si es Otro)<input id="lbNom" value="${v.nombre}" placeholder="ej. Ronda sábado"></label>
   <label>Inicio<input id="lbIni" type="time" step="900" value="${v.ini}"></label>
@@ -1493,14 +1531,14 @@ document.addEventListener('click',ev=>{
   return show(current);}
  if(!LB_ED.del)return;
  const blk=ev.target.closest('.ev');if(!blk||!view.contains(blk))return;
- const [mi,di,k]=blk.parentElement.dataset.k.split('|');
- const arr=MODELS[+mi].plan[+di][k],it=arr[+blk.dataset.i];if(!it)return;
+ const [mi,di,k]=(blk.dataset.k||blk.parentElement.dataset.k).split('|');
+ const arr=MODELS[+mi].plan[+di][k]||[],it=arr[+blk.dataset.i];if(!it)return;
  if(confirm(`¿Borrar "${it[2]}" del ${DAYS[+di]} (${it[3]})?`)){arr.splice(+blk.dataset.i,1);save();show(current);}
 });
 document.addEventListener('dblclick',ev=>{
  const blk=ev.target.closest('.ev');if(!blk||!view.contains(blk)||LB_ED.del)return;
- const [mi,di,k]=blk.parentElement.dataset.k.split('|');
- const it=MODELS[+mi].plan[+di][k][+blk.dataset.i];if(!it)return;
+ const [mi,di,k]=(blk.dataset.k||blk.parentElement.dataset.k).split('|');
+ const it=(MODELS[+mi].plan[+di][k]||[])[+blk.dataset.i];if(!it)return;
  LB_ED.edit={mi:+mi,di:+di,k,item:it};LB_ED.open=false;LB_ED.msg='';show(current);window.scrollTo({top:0,behavior:'smooth'});
 });
 
@@ -1529,7 +1567,7 @@ function lbCalc(mi){
   const h=ev.reduce((s,e)=>s+e[1]-e[0],0),ph=ev.reduce((s,e)=>s+(e[1]-e[0])*(+e[7]||0),0);
   return {lancha:lan,viajes_sem:ev.length,horas_sem:h,disponible_sem:126,uso_pct:100*h/126,ocupacion_puestos_pct:h?100*ph/(cap*h):0};});
  // parámetros de cada día leídos del horario
- const P=m.plan.map(pl=>{const ev=[...lbEv(pl,'a').map(e=>[e,'a']),...lbEv(pl,'b').map(e=>[e,'b']),...lbEv(pl,'t').map(e=>[e,'b']),...lbEv(pl,'c').map(e=>[e,'a'])],nm=n=>ev.filter(x=>x[0][2]===n).map(x=>x[0]);
+ const P=m.plan.map(pl=>{const ev=[...lbEv(pl,'a').map(e=>[e,'a']),...lbEv(pl,'b').map(e=>[e,'b']),...lbEv(pl,'t').map(e=>[e,'a']),...lbEv(pl,'c').map(e=>[e,'a'])],nm=n=>ev.filter(x=>x[0][2]===n).map(x=>x[0]);
   const r=[...nm('Ronda mañana'),...nm('Ronda tarde')];
   return {mat:nm('Materiales').map(e=>+e[7]||0),rel:nm('Relevo TT').map(e=>+e[7]||0),ronda:r.length?Math.min(...r.map(e=>+e[7]||0))-10:null,
    med:ev.filter(x=>x[0][2]==='Ronda mediodía').map(x=>[+x[0][7]||0,x[1]==='a'?3:4])};});
@@ -1971,14 +2009,14 @@ document.addEventListener('mousemove',ev=>{const sv=ev.target.closest('.dsv');co
  const pr=sv.parentNode.getBoundingClientRect(),lx=ev.clientX-pr.left;tt.style.display='block';tt.style.left=(lx>pr.width*0.6?lx-tt.offsetWidth-18:lx+18)+'px';tt.style.top=(ev.clientY-pr.top-tt.offsetHeight/2)+'px';});
 view.addEventListener('click',ev=>{const g=ev.target.closest('tr.grp');if(!g)return;g.classList.toggle('open');view.querySelectorAll('tr.g'+g.dataset.g).forEach(r=>r.classList.toggle('show'));});
 view.addEventListener('click',ev=>{const b=ev.target.closest('.rst');if(!b)return;const mi=+b.dataset.m,m=MODELS[mi];
- if(!confirm(m.id==='modelo-2'?'¿Restablecer el Modelo 2? Vuelve a quedar igual al Modelo, con la Comanche en la ronda de mediodía de lunes, martes y viernes, y se pierden los cambios hechos aquí.':`¿Restablecer el ${m.name} al horario original? Se pierden todos los cambios guardados.`))return;
- m.plan=m.id==='modelo-2'?conComanche(MODELS[0].plan):JSON.parse(ORIG)[mi];save();show(current);});
+ if(!confirm(m.id==='modelo-2'?'¿Restablecer el Modelo 2? Vuelve a quedar igual al Modelo, en un solo carril por viajes y con la Comanche en la ronda de mediodía de lunes, martes y viernes. Se pierden los cambios hechos aquí.':`¿Restablecer el ${m.name} al horario original? Se pierden todos los cambios guardados.`))return;
+ m.plan=m.id==='modelo-2'?aPool(conComanche(MODELS[0].plan)):JSON.parse(ORIG)[mi];save();show(current);});
 view.addEventListener('pointerdown',ev=>{
  const blk=ev.target.closest('.ev');if(!blk||ev.button>0)return;
- const ln=blk.parentElement;const [mi,di,k]=ln.dataset.k.split('|');
- const arr=MODELS[+mi].plan[+di][k];const item=arr[+blk.dataset.i];if(!item)return;
+ const ln=blk.parentElement;const [mi,di,k]=(blk.dataset.k||ln.dataset.k).split('|');
+ const arr=MODELS[+mi].plan[+di][k]||[];const item=arr[+blk.dataset.i];if(!item)return;
  const mode=ev.target.classList.contains('hl')?'l':ev.target.classList.contains('hr')?'r':'m';
- cur={blk,ln,mi:+mi,k,arr,item,w:ln.getBoundingClientRect().width,mode,x0:ev.clientX,y0:ev.clientY,s0:item[0],e0:item[1],ns:item[0],ne:item[1],moved:false};
+ cur={blk,ln,mi:+mi,k,vert:!MODELS[+mi].pool,arr,item,w:ln.getBoundingClientRect().width,mode,x0:ev.clientX,y0:ev.clientY,s0:item[0],e0:item[1],ns:item[0],ne:item[1],moved:false};
  try{blk.setPointerCapture(ev.pointerId);}catch(err){}
  blk.classList.add('drag');ev.preventDefault();
 });
@@ -1992,14 +2030,14 @@ view.addEventListener('pointermove',ev=>{
  c.ns=ns;c.ne=ne;
  if(Math.abs(ev.clientX-c.x0)>3||Math.abs(ev.clientY-c.y0)>3)c.moved=true;
  c.blk.style.left=P(ns)+'%';c.blk.style.width=(P(ne)-P(ns))+'%';
- if(c.mode==='m'&&c.k!=='t')c.blk.style.transform=`translateY(${ev.clientY-c.y0}px)`;
+ if(c.mode==='m'&&c.vert)c.blk.style.transform=`translateY(${ev.clientY-c.y0}px)`;
  const lab=c.blk.querySelector('b + span');if(lab)lab.textContent=c.item[6]?`desde las ${tl(ns)}`:`${tl(ns)}–${tl(ne)}`;
 });
 function endDrag(ev){
  if(!cur)return;const c=cur;cur=null;
  if(!c.moved){c.blk.classList.remove('drag');c.blk.style.transform='';return;}
  c.item[0]=c.ns;c.item[1]=c.ne;c.item[3]=c.item[6]?`desde las ${tl(c.ns)}`:`${tl(c.ns)}–${tl(c.ne)}`;
- if(c.mode==='m'&&c.k!=='t'){
+ if(c.mode==='m'&&c.vert){
   c.blk.style.visibility='hidden';
   const t=document.elementFromPoint(ev.clientX,ev.clientY);const tgt=t&&t.closest('.lane');
   if(tgt&&tgt.dataset.k&&tgt!==c.ln){const [tm,td,tk]=tgt.dataset.k.split('|');
