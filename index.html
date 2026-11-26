@@ -800,7 +800,7 @@ html.pmode .pexit:hover{opacity:1}
 .lane.pl .ev{z-index:1}
 .ev.tc,.sw.tc{background:transparent;border:2px dotted #1a1a19;color:var(--text)}
 .lane.pl .ev.tc{z-index:2}
-.cmpm td.dn{color:#0F6E56;font-weight:600}.cmpm td.up{color:#A32D2D;font-weight:600}.cmpm tr.cmc td{color:var(--muted)}
+.vdn{color:#0F6E56;font-weight:600}.vup{color:#A32D2D;font-weight:600}
 .ll.k3{border-left-color:#1a1a19;border-left-style:dotted}
 .card small{display:block;margin-top:4px;font-size:12px;color:var(--faint)}
 .hemp{margin-top:14px}
@@ -1112,8 +1112,7 @@ function renderPool(m){
  return `<div class="desc">${m.desc.map(d=>`<div><b>${d[0]}</b>${d[1]}</div>`).join('')}</div>
  ${legendH(m)}
  <div class="axrow"><div class="ax">${ax}</div></div>${rows}
- ${horasEmpresa(m)}
- ${renderModelKpi(s,mi)}
+ ${resumenM2(m)}
  <details class="dd mdd" data-mdd="lic"${MDD.has('lic')?' open':''}><summary>Formas de licitar<em>Costo actual por día a superar: ${money(BASE_COST/365)} por las 2 lanchas</em></summary><div class="mddb">${renderLic(m).replace('<h2 class="lich">Formas de licitar</h2>','')}</div></details>`;
 }
 function semChart(sem,cap){
@@ -1160,51 +1159,39 @@ function renderModelKpi(s,mi){
  const bar=(n,h)=>`<div class="br"><div class="bl"><b>${n}</b></div><div class="bt lbfree"><div class="bf" style="width:${Math.min(100,h/DISP*100)}%;background:#0F6E56" title="${fmt(h)} h navegadas"></div></div><div class="bv">${fmt(h)} de ${DISP} h · ${Math.round(h/DISP*100)}%</div></div>`;
  const box=(k,t,em,body)=>`<details class="dd mdd" data-mdd="${k}"${MDD.has(k)?' open':''}><summary>${t}<em>${em}</em></summary><div class="mddb">${body}</div></details>`;
  let sem='';try{sem=semChart(lbCalc(mi).sem,DIA);}catch(e){}
- const hu=heatUso(MODELS[mi].plan,MODELS[mi].pool),cm=mi>0?compModelo(mi):null;
+ const hu=heatUso(MODELS[mi].plan,MODELS[mi].pool);
  return `<div class="mdds">
- ${box('ind','Indicadores del modelo',`${fmt(s.tot)} h/sem (${dif(s.tot,HS)} frente a hoy${cm?`, ${cm.res} frente al ${MODELS[0].name}`:''}) · uso ${uw}% · después de las 18:00: ${hu.n17}`,`
+ ${box('ind','Indicadores del modelo',`${fmt(s.tot)} h/sem (${dif(s.tot,HS)} frente a hoy) · uso ${uw}% · después de las 18:00: ${hu.n17}`,`
   <div class="cards mkpi3">
    <div class="card"><p>Horas por semana</p><b>${fmt(s.tot)} h</b><small>Actual: ${fmt(HS)} h · <span class="dlt">${dif(s.tot,HS)}</span></small></div>
    <div class="card"><p>Horas al año</p><b>${n0(ha)} h</b><small>Actual: ${n0(HA)} h · <span class="dlt">${dif(ha,HA)}</span></small></div>
    <div class="card"><p>Uso de las 2 lanchas</p><b>${uw}%</b><small>${fmt(s.tot)} de ${DISP*2} h disponibles por semana</small></div>
   </div>
-  ${cm?cm.html:''}
   <h4 class="mdh">${MODELS[mi].pool?'Uso de las 2 lanchas por franja horaria':'Uso de cada lancha por franja horaria'}</h4>${hu.html}
   <h4 class="mdh">Horas por día, MOTI y Trader Tanker</h4>${sem}`)}
  </div>`;
 }
 // Horas por empresa (25 nov 2026, pedido de Esteban, Modelo 3): viajes de las lanchas sin opcionales; los viajes compartidos (MT) van 50% a cada empresa; la Comanche no suma.
 function horasEmp(m){let M=0,T=0;m.plan.forEach(p=>[...(p.a||[]),...(p.b||[]),...(p.t||[])].filter(e=>!e[6]).forEach(e=>{const h=e[1]-e[0];if(e[5]==='M')M+=h;else if(e[5]==='T')T+=h;else if(e[5]==='MT'){M+=h/2;T+=h/2;}}));return {M,T};}
-// Comparación con el Modelo original (26 nov 2026, pedido de Esteban): horas y viajes del modelo contra el Modelo
-function compModelo(mi){
- const a=stats(MODELS[0]),b=stats(MODELS[mi]),ea=horasEmp(MODELS[0]),eb=horasEmp(MODELS[mi]),n0=v=>String(Math.round(v));
- const df=(x,y,f,u)=>{const d=y-x,r=Math.abs(d)<0.05?0:d,pc=x?Math.round(r/x*100):0;return {t:r===0?'Igual':`${r>0?'+':'-'}${f(Math.abs(r))}${u}${x?` (${pc>0?'+':''}${pc}%)`:''}`,c:r<0?'dn':r>0?'up':''};};
- const R=[['Horas por semana',a.tot,b.tot,fmt,' h'],['Horas al año (× 52)',a.tot*52,b.tot*52,n0,' h'],['Melones (MOTI), horas/semana',ea.M,eb.M,fmt,' h'],['Trader Tanker, horas/semana',ea.T,eb.T,fmt,' h'],
-  ['Viajes por semana',a.vt,b.vt,v=>String(Math.round(v)),''],['Lanchas a la vez (máximo)',a.peak,b.peak,v=>String(Math.round(v)),'']];
- const d0=df(a.tot,b.tot,fmt,' h');
- return {res:d0.t==='Igual'?'igual':d0.t.replace(/ \(.*\)/,''),html:`<h4 class="mdh">${MODELS[mi].name} frente al ${MODELS[0].name}</h4>
- <table class="hemp cmpm"><thead><tr><th>Indicador</th><th class="n">${MODELS[0].name}</th><th class="n">${MODELS[mi].name}</th><th class="n">Diferencia</th></tr></thead><tbody>
- ${R.map(([n,x,y,f,u])=>{const d=df(x,y,f,u);return `<tr><td>${n}</td><td class="n">${f(x)}${u}</td><td class="n">${f(y)}${u}</td><td class="n ${d.c}">${d.t}</td></tr>`;}).join('')}
- <tr class="cmc"><td>Comanche, horas/semana (no suman)</td><td class="n">${fmt(a.com)} h</td><td class="n">${fmt(b.com)} h</td><td class="n">${b.vc} ${b.vc===1?'viaje':'viajes'} por semana</td></tr>
- </tbody></table>
- <p class="note">Horas de las lanchas sin horarios opcionales ni la Comanche. En verde, lo que baja frente al ${MODELS[0].name}; en rojo, lo que sube.</p>`};
-}
-function horasEmpresa(m){
- const D=m.plan.map((p,i)=>{let M=0,T=0,C=0;[...(p.a||[]),...(p.b||[]),...(p.t||[])].filter(e=>!e[6]).forEach(e=>{const h=e[1]-e[0];if(e[5]==='M')M+=h;else if(e[5]==='T')T+=h;else if(e[5]==='MT'){M+=h/2;T+=h/2;C+=h;}});return {dia:DAYS[i],M,T,C,tot:M+T};});
- const S=D.reduce((a,d)=>({M:a.M+d.M,T:a.T+d.T,C:a.C+d.C,tot:a.tot+d.tot}),{M:0,T:0,C:0,tot:0}),pc=v=>S.tot?Math.round(v/S.tot*100)+'%':'0%',n0=v=>String(Math.round(v));   // sin separador de miles: el decimal de esta pestaña es coma
- return `<h3 class="ch3">Horas por empresa (${m.name})</h3>
- <div class="cards">
-  <div class="card"><p>Melones (MOTI), horas/semana</p><b>${fmt(S.M)} h</b><small>${pc(S.M)} · ${n0(S.M*52)} h al año</small></div>
-  <div class="card"><p>Trader Tanker, horas/semana</p><b>${fmt(S.T)} h</b><small>${pc(S.T)} · ${n0(S.T*52)} h al año</small></div>
-  <div class="card"><p>Viajes compartidos, horas/semana</p><b>${fmt(S.C)} h</b><small>50% a cada empresa</small></div>
-  <div class="card"><p>Total, horas/semana</p><b>${fmt(S.tot)} h</b><small>${n0(S.tot*52)} h al año</small></div>
+// Resumen del Modelo 2 (26 nov 2026, pedido de Esteban): a la vista solo horas por semana, viajes por semana y horas al año, cada una contra el Modelo;
+// las horas por empresa (compartidos 50/50, sin opcionales ni Comanche) y su comparación van en un recuadro plegado.
+function resumenM2(m){
+ const s=stats(m),a=stats(MODELS[0]),e=horasEmp(m),ea=horasEmp(MODELS[0]),n0=v=>String(Math.round(v)),M0=MODELS[0].name;
+ const df=(x,y,f,u)=>{const d=Math.abs(y-x)<0.05?0:y-x,pc=x?Math.round(d/x*100):0;return d===0?'<span>Igual</span>':`<span class="${d<0?'vdn':'vup'}">${d>0?'+':'-'}${f(Math.abs(d))}${u}${x?` (${pc>0?'+':''}${pc}%)`:''}</span>`;};
+ const card=(t,v,x,y,f,u)=>`<div class="card"><p>${t}</p><b>${v}</b><small>${M0}: ${f(x)}${u} · ${df(x,y,f,u)}</small></div>`;
+ const fila=(n,y,x)=>`<tr><td>${n}</td><td class="n">${fmt(y)} h</td><td class="n">${n0(y*52)} h</td><td class="n">${fmt(x)} h</td><td class="n">${df(x,y,fmt,' h')}</td></tr>`;
+ return `<h3 class="ch3">Resumen del ${m.name}</h3>
+ <div class="cards mkpi3">
+  ${card('Horas por semana',fmt(s.tot)+' h',a.tot,s.tot,fmt,' h')}
+  ${card('Viajes por semana',s.vt,a.vt,s.vt,n0,'')}
+  ${card('Horas al año',n0(s.tot*52)+' h',a.tot*52,s.tot*52,n0,' h')}
  </div>
- <table class="hemp"><thead><tr><th>Día</th><th class="n">Melones (MOTI)</th><th class="n">Trader Tanker</th><th class="n">Compartidos (50/50)</th><th class="n">Total</th></tr></thead><tbody>
- ${D.map(d=>`<tr><td>${d.dia}</td><td class="n">${fmt(d.M)} h</td><td class="n">${fmt(d.T)} h</td><td class="n">${fmt(d.C)} h</td><td class="n">${fmt(d.tot)} h</td></tr>`).join('')}
- <tr class="tt"><td>Semana</td><td class="n">${fmt(S.M)} h</td><td class="n">${fmt(S.T)} h</td><td class="n">${fmt(S.C)} h</td><td class="n">${fmt(S.tot)} h</td></tr>
- <tr><td>Año (× 52)</td><td class="n">${n0(S.M*52)} h</td><td class="n">${n0(S.T*52)} h</td><td class="n">${n0(S.C*52)} h</td><td class="n">${n0(S.tot*52)} h</td></tr>
+ <details class="dd mdd" data-mdd="emp" style="margin-top:14px"${MDD.has('emp')?' open':''}><summary>Horas por empresa<em>Melones (MOTI) ${fmt(e.M)} h · Trader Tanker ${fmt(e.T)} h por semana</em></summary><div class="mddb">
+ <table class="hemp"><thead><tr><th>Empresa</th><th class="n">${m.name}, h/semana</th><th class="n">${m.name}, h/año</th><th class="n">${M0}, h/semana</th><th class="n">Diferencia</th></tr></thead><tbody>
+ ${fila('Melones (MOTI)',e.M,ea.M)}${fila('Trader Tanker',e.T,ea.T)}
+ <tr class="tt"><td>Total</td><td class="n">${fmt(s.tot)} h</td><td class="n">${n0(s.tot*52)} h</td><td class="n">${fmt(a.tot)} h</td><td class="n">${df(a.tot,s.tot,fmt,' h')}</td></tr>
  </tbody></table>
- <p class="note">Horas de las lanchas, sin horarios opcionales. Los viajes compartidos entre Melones y Trader Tanker se reparten 50% para cada empresa (la columna Compartidos muestra sus horas completas, ya incluidas en las dos primeras). La Comanche no suma horas.</p>`;
+ <p class="note">Sin horarios opcionales. Los viajes compartidos entre Melones y Trader Tanker van 50% a cada empresa. La Comanche no suma horas (${fmt(s.com)} h por semana en el ${m.name}).</p></div></details>`;
 }
 function renderModel(m){
  if(m.pool)return renderPool(m);
@@ -1218,7 +1205,6 @@ function renderModel(m){
  return `<div class="desc">${m.desc.map(d=>`<div><b>${d[0]}</b>${d[1]}</div>`).join('')}</div>
  ${legendH(m)}
  <div class="axrow"><div class="ax">${ax}</div></div>${rows}
- ${m.id==='modelo-2'?horasEmpresa(m):''}
  ${renderModelKpi(s,mi)}
  <details class="dd mdd" data-mdd="lic"${MDD.has('lic')?' open':''}><summary>Formas de licitar<em>Costo actual por día a superar: ${money(BASE_COST/365)} por las 2 lanchas</em></summary><div class="mddb">${renderLic(m).replace('<h2 class="lich">Formas de licitar</h2>','')}</div></details>`;
 }
