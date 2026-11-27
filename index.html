@@ -318,15 +318,15 @@ html.pmode .pexit:hover{opacity:1}
 .m2res{display:flex;align-items:baseline;gap:1vw;padding-top:1.8vh;border-top:1px solid rgba(255,255,255,.14)}
 .m2res b{font-size:clamp(34px,3.2vw,60px);font-weight:900;line-height:1;color:#C0DD97;font-variant-numeric:tabular-nums;white-space:nowrap}
 .m2res span{font-size:clamp(16px,1.35vw,25px);font-weight:600;color:rgba(241,239,232,.82);line-height:1.3}
-.m2c{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:2vw;flex:1;align-items:stretch}
-.m2c .cmt td,.m2c .cmt th{padding-top:1.15vh;padding-bottom:1.15vh}
-.m2c .cmt td small{display:block;font-size:.7em;color:rgba(241,239,232,.58)}
-.m2c .cmt td:first-child small{font-weight:500}
-.m2c .cmt tr.m2cov td{font-size:1.35em;font-weight:900;color:#C0DD97}
-.m2c .col{gap:2vh;justify-content:center}
-.m2c .lr>span{font-size:clamp(15px,1.2vw,22px)}
-.m2c .lr>b{font-size:clamp(18px,1.6vw,30px)}
-.m2c .lr{grid-template-columns:1.6vw minmax(0,1fr) auto}
+.m2c1{display:flex;flex-direction:column;gap:2.4vh;flex:1;justify-content:center}
+.m2ct{font-size:clamp(15px,1.4vw,27px)}
+.m2ct th{font-size:clamp(16px,1.5vw,29px)}
+.m2ct th:first-child{width:34%}
+.m2ct td,.m2ct th{padding-top:1.35vh;padding-bottom:1.35vh}
+.m2ct td small{display:block;font-size:.68em;color:rgba(241,239,232,.58)}
+.m2ct td b.cdn,.m2ct td b.cup{font-weight:800}
+.m2ct tr.ctot td b{font-size:1em}
+.m2c1 .pen{margin:0}
 .m2p{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:2vw;flex:1;align-items:stretch}
 .m2p .col{gap:2.2vh;justify-content:center}
 .m2p .rw{font-size:clamp(19px,1.6vw,30px)}
@@ -1889,6 +1889,7 @@ function renderPres(){
   const h0=s0.tot*52,h2=s2.tot*52,u0=tH*(100-c0)/100,u2=tH*(100-c2)/100;
   const P0=h0*avg,P2=h2*avg,U0=u0*avg,U2=u2*avg,T0=P0+U0+COORD,T2=P2+U2+COORD,dT=T0-T2;
   const sg=v=>(v<0?'−':'+')+kf(Math.abs(v)),sgh=v=>(v<0?'−':'+')+nfp(Math.abs(v))+' h';
+  const dd=(v,f,good)=>Math.abs(v)<0.5?'Igual':`<b class="${v*good<0?'cdn':'cup'}">${v<0?'−':'+'}${f(Math.abs(v))}</b>`;   // diferencia Modelo 2 menos Modelo: verde si conviene, rojo si no
   const cl=t=>t>BASE_COST?'cup':'cdn',dif=t=>{const d=t-BASE_COST;return d>0?`<b class="cup">+${kf(d)}</b><small>${p0(d/BASE_COST*100)} más</small>`:`<b class="cdn">−${kf(-d)}</b><small>${p0(-d/BASE_COST*100)} menos</small>`;};
   // paquete del trimestre (13 semanas) con el Modelo 2: viajes por tipo y por capacidad
   const Q=13,ev=M2.plan.flatMap(d=>(d.t||[]).filter(e=>!e[6])),isC=e=>e[2]==='Materiales'||!!e[9],hh=a=>a.reduce((x,e)=>x+e[1]-e[0],0);
@@ -1930,26 +1931,18 @@ function renderPres(){
  </section>
  <section class="sl m2s">${numB(2)}
   <p class="kick">Modelo y Modelo 2</p>
-  <div class="m2c">
-   <table class="cmt"><thead><tr><th></th><th>Hoy</th><th>Modelo</th><th>Modelo 2</th></tr></thead><tbody>
-    <tr class="m2cov"><td>Cobertura de tareas<small>sale el mismo día, sin Comanche</small></td><td></td><td>${c0}%</td><td>${c2}%</td></tr>
-    <tr><td>Horas del programa al año</td><td>${nfp(tH)} h<small>navegadas</small></td><td>${nfp(h0)} h</td><td>${nfp(h2)} h</td></tr>
-    <tr><td>Lo que no cubre el programa<small>% de las ${nfp(tH)} h de hoy</small></td><td></td><td>${nfp(u0)} h<small>${100-c0}%</small></td><td>${nfp(u2)} h<small>${100-c2}%</small></td></tr>
-    <tr><td>Programa<small>a ${money(avg)}/h, la hora promedio actual</small></td><td></td><td>${kf(P0)}</td><td>${kf(P2)}</td></tr>
-    <tr><td>Lo que no cubre<small>a ${money(avg)}/h</small></td><td></td><td>${kf(U0)}</td><td>${kf(U2)}</td></tr>
-    <tr><td>Coordinador logístico</td><td></td><td>${kf(COORD)}</td><td>${kf(COORD)}</td></tr>
-    <tr class="ctot"><td>Costo anual</td><td>${kf(BASE_COST)}</td><td><b class="${cl(T0)}">${kf(T0)}</b></td><td><b class="${cl(T2)}">${kf(T2)}</b></td></tr>
-    <tr class="cdif"><td>Diferencia contra hoy</td><td></td><td>${dif(T0)}</td><td>${dif(T2)}</td></tr>
+  <div class="m2c1">
+   <table class="cmt m2ct"><thead><tr><th></th><th>Modelo<small>cálculo anterior</small></th><th>Modelo 2<small>nueva estimación</small></th><th>Diferencia</th></tr></thead><tbody>
+    <tr><td>Horas al año</td><td>${nfp(h0)} h</td><td>${nfp(h2)} h</td><td>${dd(h2-h0,v=>nfp(v)+' h',1)}</td></tr>
+    <tr><td>Cobertura</td><td>${c0}%</td><td>${c2}%</td><td>${dd(c2-c0,v=>v+' puntos',-1)}</td></tr>
+    <tr><td>Horas no cubiertas</td><td>${nfp(u0)} h<small>${100-c0}%</small></td><td>${nfp(u2)} h<small>${100-c2}%</small></td><td>${dd(u2-u0,v=>nfp(v)+' h',1)}</td></tr>
+    <tr><td>Programa</td><td>${kf(P0)}</td><td>${kf(P2)}</td><td>${dd(P2-P0,kf,1)}</td></tr>
+    <tr><td>No cubierto</td><td>${kf(U0)}</td><td>${kf(U2)}</td><td>${dd(U2-U0,kf,1)}</td></tr>
+    <tr><td>Coordinador</td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td>Igual</td></tr>
+    <tr class="ctot"><td>Costo anual</td><td>${kf(T0)}</td><td>${kf(T2)}</td><td>${dd(T2-T0,kf,1)}<small>${p0(Math.abs(dT)/T0*100)} ${dT>=0?'menos':'más'}</small></td></tr>
+    <tr class="cdif"><td>Contra hoy (${kf(BASE_COST)})</td><td>${dif(T0)}</td><td>${dif(T2)}</td><td></td></tr>
    </tbody></table>
-   <div class="col">
-    <span class="cvt">Modelo 2 frente al Modelo</span>
-    <div class="lg5">
-     <div class="lr"><i></i><span>Programa<small>${sgh(h2-h0)} al año</small></span><b>${sg(P2-P0)}</b></div>
-     <div class="lr"><i>+</i><span>Lo que no cubre<small>${sgh(u2-u0)} al año</small></span><b>${sg(U2-U0)}</b></div>
-     <div class="lr lsv${dT<0?' lng':''}"><i>=</i><span>${dT>=0?'Ahorro':'Costo adicional'} al año<small>${p0(Math.abs(dT)/T0*100)} ${dT>=0?'menos':'más'} que el Modelo</small></span><b>${kf(Math.abs(dT))}</b></div>
-    </div>
-    <p class="pen">Con 2 días de aviso la cobertura sube a ${Math.floor(cv0[1])}% y ${Math.floor(cv2[1])}%. No incluye la Comanche: en el Modelo 2 hace ${fmt(comH)} h por semana y su costo está por definir.</p>
-   </div>
+   <p class="pen">A ${money(avg)}/h, la hora promedio actual. Cobertura del mismo día, sin Comanche. Las horas no cubiertas son ese % de las ${nfp(tH)} h de hoy, igual que el spot de la lámina 5.</p>
   </div>
  </section>
  <section class="sl m2s">${numB(3)}
