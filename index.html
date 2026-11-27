@@ -321,12 +321,11 @@ html.pmode .pexit:hover{opacity:1}
 .m2c1{display:flex;flex-direction:column;gap:2.4vh;flex:1;justify-content:center}
 .m2ct{font-size:clamp(15px,1.4vw,27px)}
 .m2ct th{font-size:clamp(16px,1.5vw,29px)}
-.m2ct th:first-child{width:34%}
+.m2ct th:first-child{width:27%}
 .m2ct td,.m2ct th{padding-top:1.35vh;padding-bottom:1.35vh}
 .m2ct td small{display:block;font-size:.68em;color:rgba(241,239,232,.58)}
 .m2ct td b.cdn,.m2ct td b.cup{font-weight:800}
 .m2ct tr.ctot td b{font-size:1em}
-.m2c1 .pen{margin:0}
 .m2p{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:2vw;flex:1;align-items:stretch}
 .m2p .col{gap:2.2vh;justify-content:center}
 .m2p .rw{font-size:clamp(19px,1.6vw,30px)}
@@ -1885,10 +1884,12 @@ function renderPres(){
   const M0=MODELS[0],M2=MODELS[1],s0=stats(M0),s2=stats(M2),avg=BASE_COST/tH;
   // cobertura del mismo día, ponderada por horas y sin la Comanche; se redondea hacia abajo (90% y 85% con lo guardado el 26 nov)
   const cv0=cobPond(0),cv2=cobPond(1),c0=Math.floor(cv0[0]),c2=Math.floor(cv2[0]);
-  // lo que no cubre el programa se paga a la hora promedio actual, sobre las horas de hoy (mismo criterio que el 10% de spot de las láminas 4 y 5)
-  const h0=s0.tot*52,h2=s2.tot*52,u0=tH*(100-c0)/100,u2=tH*(100-c2)/100;
+  // lo que no cubre el programa: el % que falta sobre las horas de cada modelo, a la hora promedio actual (Esteban, 27 nov 2026)
+  const h0=Math.round(s0.tot*52),h2=Math.round(s2.tot*52),u0=Math.round(h0*(100-c0)/100),u2=Math.round(h2*(100-c2)/100);
   const P0=h0*avg,P2=h2*avg,U0=u0*avg,U2=u2*avg,T0=P0+U0+COORD,T2=P2+U2+COORD,dT=T0-T2;
   const sg=v=>(v<0?'−':'+')+kf(Math.abs(v)),sgh=v=>(v<0?'−':'+')+nfp(Math.abs(v))+' h';
+  // costos de la tabla en miles, redondeados antes de sumar y restar, para que las filas cuadren a la vista
+  const K=v=>Math.round(v/1000),kk=v=>'$'+nfp(v)+'k',P0k=K(P0),P2k=K(P2),U0k=K(U0),U2k=K(U2),Ck=K(COORD),T0k=P0k+U0k+Ck,T2k=P2k+U2k+Ck;
   const dd=(v,f,good)=>Math.abs(v)<0.5?'Igual':`<b class="${v*good<0?'cdn':'cup'}">${v<0?'−':'+'}${f(Math.abs(v))}</b>`;   // diferencia Modelo 2 menos Modelo: verde si conviene, rojo si no
   const cl=t=>t>BASE_COST?'cup':'cdn',dif=t=>{const d=t-BASE_COST;return d>0?`<b class="cup">+${kf(d)}</b><small>${p0(d/BASE_COST*100)} más</small>`:`<b class="cdn">−${kf(-d)}</b><small>${p0(-d/BASE_COST*100)} menos</small>`;};
   // paquete del trimestre (13 semanas) con el Modelo 2: viajes por tipo y por capacidad
@@ -1932,17 +1933,15 @@ function renderPres(){
  <section class="sl m2s">${numB(2)}
   <p class="kick">Modelo y Modelo 2</p>
   <div class="m2c1">
-   <table class="cmt m2ct"><thead><tr><th></th><th>Modelo<small>cálculo anterior</small></th><th>Modelo 2<small>nueva estimación</small></th><th>Diferencia</th></tr></thead><tbody>
-    <tr><td>Horas al año</td><td>${nfp(h0)} h</td><td>${nfp(h2)} h</td><td>${dd(h2-h0,v=>nfp(v)+' h',1)}</td></tr>
-    <tr><td>Cobertura</td><td>${c0}%</td><td>${c2}%</td><td>${dd(c2-c0,v=>v+' puntos',-1)}</td></tr>
-    <tr><td>Horas no cubiertas</td><td>${nfp(u0)} h<small>${100-c0}%</small></td><td>${nfp(u2)} h<small>${100-c2}%</small></td><td>${dd(u2-u0,v=>nfp(v)+' h',1)}</td></tr>
-    <tr><td>Programa</td><td>${kf(P0)}</td><td>${kf(P2)}</td><td>${dd(P2-P0,kf,1)}</td></tr>
-    <tr><td>No cubierto</td><td>${kf(U0)}</td><td>${kf(U2)}</td><td>${dd(U2-U0,kf,1)}</td></tr>
-    <tr><td>Coordinador</td><td>${kf(COORD)}</td><td>${kf(COORD)}</td><td>Igual</td></tr>
-    <tr class="ctot"><td>Costo anual</td><td>${kf(T0)}</td><td>${kf(T2)}</td><td>${dd(T2-T0,kf,1)}<small>${p0(Math.abs(dT)/T0*100)} ${dT>=0?'menos':'más'}</small></td></tr>
-    <tr class="cdif"><td>Contra hoy (${kf(BASE_COST)})</td><td>${dif(T0)}</td><td>${dif(T2)}</td><td></td></tr>
+   <table class="cmt m2ct"><thead><tr><th></th><th>Hoy<small>situación actual</small></th><th>Modelo<small>cálculo anterior</small></th><th>Modelo 2<small>nueva estimación</small></th><th>Diferencia<small>Modelo 2 vs Modelo</small></th></tr></thead><tbody>
+    <tr><td>Horas al año</td><td>${nfp(tH)} h</td><td>${nfp(h0)} h</td><td>${nfp(h2)} h</td><td>${dd(h2-h0,v=>nfp(v)+' h',1)}</td></tr>
+    <tr><td>Cobertura</td><td></td><td>${c0}%</td><td>${c2}%</td><td>${dd(c2-c0,v=>v+' puntos',-1)}</td></tr>
+    <tr><td>Horas no cubiertas</td><td></td><td>${nfp(u0)} h</td><td>${nfp(u2)} h</td><td>${dd(u2-u0,v=>nfp(v)+' h',1)}</td></tr>
+    <tr><td>Programa a ${money(avg)}/h</td><td></td><td>${kk(P0k)}</td><td>${kk(P2k)}</td><td>${dd(P2k-P0k,kk,1)}</td></tr>
+    <tr><td>No cubierto a ${money(avg)}/h</td><td></td><td>${kk(U0k)}</td><td>${kk(U2k)}</td><td>${dd(U2k-U0k,kk,1)}</td></tr>
+    <tr><td>Coordinador</td><td></td><td>${kk(Ck)}</td><td>${kk(Ck)}</td><td>Igual</td></tr>
+    <tr class="ctot"><td>Costo anual</td><td>${kk(K(BASE_COST))}</td><td>${kk(T0k)}</td><td>${kk(T2k)}</td><td>${dd(T2k-T0k,kk,1)}</td></tr>
    </tbody></table>
-   <p class="pen">A ${money(avg)}/h, la hora promedio actual. Cobertura del mismo día, sin Comanche. Las horas no cubiertas son ese % de las ${nfp(tH)} h de hoy, igual que el spot de la lámina 5.</p>
   </div>
  </section>
  <section class="sl m2s">${numB(3)}
